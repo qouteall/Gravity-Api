@@ -38,8 +38,8 @@ public abstract class InGameOverlayRendererMixin {
             double e = eyePos.y + (double)(((float)((i >> 1) % 2) - 0.5F) * multipliers.y());
             double f = eyePos.z + (double)(((float)((i >> 2) % 2) - 0.5F) * multipliers.z());
             mutable.set(d, e, f);
-            BlockState blockState = player.world.getBlockState(mutable);
-            if (blockState.getRenderType() != BlockRenderType.INVISIBLE && blockState.shouldBlockVision(player.world, mutable)) {
+            BlockState blockState = player.getWorld().getBlockState(mutable);
+            if (blockState.getRenderType() != BlockRenderType.INVISIBLE && blockState.shouldBlockVision(player.getWorld(), mutable)) {
                 cir.setReturnValue(blockState);
             }
         }

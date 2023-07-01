@@ -134,7 +134,7 @@ public class GravityDirectionComponent implements GravityComponent {
         // if gravity changed from down to up, also move up
         Direction movingDirection = oldGravity.getOpposite();
         
-        Iterable<VoxelShape> collisions = entity.world.getCollisions(entity, entityBoundingBox);
+        Iterable<VoxelShape> collisions = entity.getWorld().getCollisions(entity, entityBoundingBox);
         Box totalCollisionBox = null;
         for (VoxelShape collision : collisions) {
             if (!collision.isEmpty()) {
@@ -185,14 +185,8 @@ public class GravityDirectionComponent implements GravityComponent {
         if (highestPriority != null) {
             strength = highestPriority.strength();
         }
-        System.out.println("START");
-        System.out.println(defaultGravityStrength);
-        System.out.println(GravityChangerAPI.getDimensionGravityStrength(entity.world));
-        System.out.println(strength);
-        System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
-        System.out.println("END");
-        //System.out.println(defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength);
-        return defaultGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.world) * strength;
+        double dimStrength = GravityChangerAPI.getDimensionGravityStrength(entity.getWorld());
+        return defaultGravityStrength * dimStrength * strength;
     }
 
     @Override
@@ -241,8 +235,8 @@ public class GravityDirectionComponent implements GravityComponent {
             Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
-                long timeMs = entity.world.getTime() * 50;
-                if(entity.world.isClient) {
+                long timeMs = entity.getWorld().getTime() * 50;
+                if(entity.getWorld().isClient) {
                     animation.applyRotationAnimation(
                             newGravity, oldGravity,
                             initialGravity ? 0 : rotationParameters.rotationTime(),
@@ -367,7 +361,12 @@ public class GravityDirectionComponent implements GravityComponent {
             gravityList = newGravityList;
         }
         prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
-        defaultGravityStrength = nbt.getDouble("DefaultGravityStrength");
+        if (nbt.contains("DefaultGravityStrength")) {
+            defaultGravityStrength = nbt.getDouble("DefaultGravityStrength");
+        }
+        else {
+            defaultGravityStrength = 1.0;
+        }
         defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
         isInverted = nbt.getBoolean("IsGravityInverted");
         //Update
@@ -418,7 +417,7 @@ public class GravityDirectionComponent implements GravityComponent {
                 temp.decrementDuration();
             }
         }
-        if(!entity.world.isClient && needsInitialSync){
+        if(!entity.getWorld().isClient && needsInitialSync){
             needsInitialSync = false;
             RotationParameters rotationParameters = new RotationParameters(false, false, false, 0);
             GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE, rotationParameters, true);

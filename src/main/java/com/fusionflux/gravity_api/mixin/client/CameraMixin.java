@@ -70,7 +70,7 @@ public abstract class CameraMixin {
             original.call(this, x, y, z);
             return;
         }
-        long timeMs = focusedEntity.world.getTime()*50+(long)(storedTickDelta*50);
+        long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
         Quaternionf gravityRotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
         gravityRotation.conjugate();
 
@@ -106,7 +106,7 @@ public abstract class CameraMixin {
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
-            long timeMs = focusedEntity.world.getTime()*50+(long)(storedTickDelta*50);
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
             Quaternionf rotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
             rotation.conjugate();
             rotation.mul(this.rotation);

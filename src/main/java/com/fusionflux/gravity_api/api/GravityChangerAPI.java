@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -29,8 +30,8 @@ public abstract class GravityChangerAPI {
     public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
             ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
 
-    public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH_COMPONENT =
-            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
+//    public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH_COMPONENT =
+//            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
     
     // workaround for a CCA bug; maybeGet throws an NPE in internal code if the DataTracker isn't initialized
     // null check the component container to avoid it
@@ -99,7 +100,8 @@ public abstract class GravityChangerAPI {
     }
 
     public static double getDimensionGravityStrength(World world) {
-        return maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).map(GravityDimensionStrengthInterface::getDimensionGravityStrength).orElse(1d);
+        return 1;
+//        return maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).map(GravityDimensionStrengthInterface::getDimensionGravityStrength).orElse(1d);
     }
 
     public static Direction getActualGravityDirection(Entity entity) {
@@ -215,7 +217,8 @@ public abstract class GravityChangerAPI {
     }
 
     public static void setDimensionGravityStrength(World world, double strength) {
-        maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).ifPresent(component -> component.setDimensionGravityStrength(strength));
+        throw new NotImplementedException();
+//        maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).ifPresent(component -> component.setDimensionGravityStrength(strength));
     }
 
     @Environment(EnvType.CLIENT)
@@ -319,11 +322,11 @@ public abstract class GravityChangerAPI {
     }
 
     private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
-        if(entity.world.isClient && shouldBeOnServer) {
+        if(entity.getWorld().isClient && shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
             return false;
         }
-        if(!entity.world.isClient && !shouldBeOnServer) {
+        if(!entity.getWorld().isClient && !shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
             return false;
         }

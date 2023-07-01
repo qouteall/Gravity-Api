@@ -37,7 +37,7 @@ public abstract class GameRendererMixin {
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
-            long timeMs = focusedEntity.world.getTime()*50+(long)(tickDelta*50);
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(tickDelta*50);
             Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
             matrix.multiply(currentGravityRotation);
         }

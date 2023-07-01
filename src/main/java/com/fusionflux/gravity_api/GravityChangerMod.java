@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +36,7 @@ public class GravityChangerMod implements ModInitializer {
             (dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher)
         );
     
-        GravityChangerGroup = FabricItemGroup.builder(id("general"))
+        GravityChangerGroup = FabricItemGroup.builder()
             .icon(() -> new ItemStack(ModItems.GRAVITY_CHANGER_UP))
             .entries((enabledFeatures, entries) -> {
                 entries.add(new ItemStack(ModItems.GRAVITY_CHANGER_UP));
@@ -52,6 +53,7 @@ public class GravityChangerMod implements ModInitializer {
                 entries.add(new ItemStack(ModItems.GRAVITY_CHANGER_NORTH_AOE));
                 entries.add(new ItemStack(ModItems.GRAVITY_CHANGER_SOUTH_AOE));
             })
+            .displayName(Text.translatable("itemGroup.gravity_api"))
             .build();
     }
 

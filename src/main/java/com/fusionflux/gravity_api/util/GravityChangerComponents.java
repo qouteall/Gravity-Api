@@ -11,7 +11,11 @@ public class GravityChangerComponents implements EntityComponentInitializer {
 
     public static final ComponentKey<GravityComponent> GRAVITY_MODIFIER =
             ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
-
+    
+//    public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH =
+//        ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
+    
+    
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(Entity.class, GRAVITY_MODIFIER, GravityDirectionComponent::new);

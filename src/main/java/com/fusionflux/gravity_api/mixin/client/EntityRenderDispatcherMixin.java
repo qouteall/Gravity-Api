@@ -55,7 +55,7 @@ public abstract class EntityRenderDispatcherMixin {
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
-            long timeMs = entity.world.getTime()*50+(long)(tickDelta*50);
+            long timeMs = entity.getWorld().getTime()*50+(long)(tickDelta*50);
             matrices.multiply(new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs)).conjugate());
         }
     }
