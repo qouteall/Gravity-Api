@@ -51,7 +51,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) return;
 
@@ -63,7 +63,7 @@ public abstract class EntityRenderDispatcherMixin {
             matrices.mulPose(new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs)).conjugate());
         }
     }
-
+    
     @Inject(
             method = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;render(Lnet/minecraft/world/entity/Entity;DDDFFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At(
@@ -73,7 +73,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) return;
 
@@ -91,7 +91,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
+        if(!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (gravityDirection == Direction.DOWN) return;
             if (!this.shouldRenderShadow) return;

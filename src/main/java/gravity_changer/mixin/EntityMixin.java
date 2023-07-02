@@ -232,25 +232,26 @@ public abstract class EntityMixin{
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
     
-    @ModifyArg(
-        method = "move",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/phys/Vec3;multiply(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
-            ordinal = 0
-        ),
-        index = 0
-    )
-    private Vec3 modify_move_multiply_0(Vec3 vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) {
-            return vec3d;
-        }
-        
-        return RotationUtil.maskPlayerToWorld(vec3d, gravityDirection);
-    }
+    // looks like not useful
+//    @ModifyArg(
+//        method = "move",
+//        at = @At(
+//            value = "INVOKE",
+//            target = "Lnet/minecraft/world/phys/Vec3;multiply(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
+//            ordinal = 0
+//        ),
+//        index = 0
+//    )
+//    private Vec3 modify_move_multiply_0(Vec3 vec3d) {
+//        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
+//        if (gravityDirection == Direction.DOWN) {
+//            return vec3d;
+//        }
+//
+//        return RotationUtil.maskPlayerToWorld(vec3d, gravityDirection);
+//    }
     
-    
+    // transform the argument vector back to local coordinate
     @ModifyVariable(
         method = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
         at = @At(
@@ -270,6 +271,7 @@ public abstract class EntityMixin{
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
     
+    // transform the local variable (result from collide()) to local coordinate
     @ModifyVariable(
         method = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
         at = @At(
@@ -300,6 +302,7 @@ public abstract class EntityMixin{
         cir.setReturnValue(blockPos);
     }
     
+    // transform the argument to local coordinate
     @ModifyVariable(
         method = "collide",
         at = @At(
@@ -318,6 +321,8 @@ public abstract class EntityMixin{
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
     
+    // transform the result to world coordinate
+    // the input to Entity.collideBoundingBox will be in local coord
     @Inject(
         method = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
         at = @At("RETURN"),
@@ -330,6 +335,8 @@ public abstract class EntityMixin{
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
     }
     
+    // the argument was transformed to local coord,
+    // but bounding box stretch needs world coord
     @ModifyArgs(
         method = "collide",
         at = @At(
@@ -345,6 +352,8 @@ public abstract class EntityMixin{
         args.set(2, rotate.z);
     }
     
+    // the argument was transformed to local coord,
+    // but bounding box move needs world coord
     @ModifyArgs(
         method = "collide",
         at = @At(
@@ -358,6 +367,7 @@ public abstract class EntityMixin{
         args.set(0, rotate);
     }
     
+    // Entity.collideBoundingBox is inputed with local coord, transform it to world coord
     @ModifyVariable(
         method = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;",
         at = @At("HEAD"),
@@ -377,6 +387,7 @@ public abstract class EntityMixin{
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
     
+    // transform back to local coord
     @Inject(
         method = "Lnet/minecraft/world/entity/Entity;collideBoundingBox(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Lnet/minecraft/world/level/Level;Ljava/util/List;)Lnet/minecraft/world/phys/Vec3;",
         at = @At("RETURN"),
