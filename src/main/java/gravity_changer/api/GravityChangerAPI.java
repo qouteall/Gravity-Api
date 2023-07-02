@@ -51,7 +51,7 @@ public abstract class GravityChangerAPI {
      * Returns the applied gravity direction for the given player
      * This is the direction that directly affects everything this mod changes
      * If the player is riding a vehicle this will be the applied gravity direction of the vehicle
-     * Otherwise it will be the main gravity gravity direction of the player itself
+     * Otherwise it will be the main gravity direction of the player itself
      */
     public static Direction getGravityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
@@ -67,7 +67,7 @@ public abstract class GravityChangerAPI {
         return new ArrayList<Gravity>();
     }
     
-    public static Direction getPrevGravtityDirection(Entity entity) {
+    public static Direction getPrevGravityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevGravityDirection).orElse(Direction.DOWN);
         }

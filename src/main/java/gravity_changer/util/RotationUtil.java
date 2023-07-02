@@ -207,6 +207,9 @@ public abstract class RotationUtil {
         WORLD_ROTATION_QUATERNIONS[5].mul(Axis.YP.rotationDegrees(-270));
     }
     
+    /**
+     * Note: don't modify the quaternion object in-place
+     */
     public static Quaternionf getWorldRotationQuaternion(Direction gravityDirection) {
         return WORLD_ROTATION_QUATERNIONS[gravityDirection.get3DDataValue()];
     }
@@ -219,6 +222,9 @@ public abstract class RotationUtil {
         }
     }
     
+    /**
+     * Note: don't modify the quaternion object in-place
+     */
     public static Quaternionf getCameraRotationQuaternion(Direction gravityDirection) {
         return ENTITY_ROTATION_QUATERNIONS[gravityDirection.get3DDataValue()];
     }
