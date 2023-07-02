@@ -19,10 +19,10 @@ public abstract class RamImpactTaskMixin {
     @Shadow private Vec3 ramDirection;
 
     @WrapOperation(
-            method = "keepRunning(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/GoatEntity;J)V",
+            method = "tick",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;takeKnockback(DDD)V",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V",
                     ordinal = 0
             )
     )

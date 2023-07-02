@@ -40,6 +40,6 @@ public abstract class PiglinEntityMixin implements CrossbowAttackMob {
         double g = targetPos.y - projectile.getY() + f * 0.20000000298023224D;
         Vector3f vec3f = this.getProjectileShotVector(entity, new Vec3(d, g, e), multishotSpray);
         projectile.shoot((double)vec3f.x(), (double)vec3f.y(), (double)vec3f.z(), speed, (float)(14 - entity.level().getDifficulty().getId() * 4));
-        entity.playSound(SoundEvents.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
+        entity.playSound(SoundEvents.CROSSBOW_SHOOT, 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 }

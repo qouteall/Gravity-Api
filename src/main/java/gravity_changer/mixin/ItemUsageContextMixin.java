@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(UseOnContext.class)
 public abstract class ItemUsageContextMixin {
     @WrapOperation(
-            method = "getPlayerYaw",
+            method = "getRotation",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F",
+                    target = "Lnet/minecraft/world/entity/player/Player;getYRot()F",
                     ordinal = 0
             )
     )

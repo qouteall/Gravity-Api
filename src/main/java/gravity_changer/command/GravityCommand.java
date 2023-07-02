@@ -9,12 +9,10 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
-
 import java.util.Collection;
 import java.util.Collections;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -22,48 +20,48 @@ import net.minecraft.world.entity.Entity;
 
 public class GravityCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        LiteralArgumentBuilder<CommandSourceStack> literalSet = literal("add");
+        LiteralArgumentBuilder<CommandSourceStack> literalSet = Commands.literal("add");
         for (Direction direction : Direction.values()) {
             literalSet.then(
-                    literal(direction.getName())
-                            .then(argument("priority", IntegerArgumentType.integer())
-                                    .then(argument("duration", IntegerArgumentType.integer())
+                Commands.literal(direction.getName())
+                            .then(Commands.argument("priority", IntegerArgumentType.integer())
+                                    .then(Commands.argument("duration", IntegerArgumentType.integer())
                                             .executes(context -> executeSet(context.getSource(), direction,IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), Collections.singleton(context.getSource().getPlayer())))
-                                                .then(argument("entities", EntityArgument.entities())
+                                                .then(Commands.argument("entities", EntityArgument.entities())
                                                         .executes(context -> executeSet(context.getSource(), direction, IntegerArgumentType.getInteger(context, "priority"), IntegerArgumentType.getInteger(context, "duration"), EntityArgument.getEntities(context, "entities"))))))
             );
         }
 
-        LiteralArgumentBuilder<CommandSourceStack> literalSetDefault = literal("set");
+        LiteralArgumentBuilder<CommandSourceStack> literalSetDefault = Commands.literal("set");
         for (Direction direction : Direction.values())
-            literalSetDefault.then(literal(direction.getName())
+            literalSetDefault.then(Commands.literal(direction.getName())
                     .executes(context -> executeSetDefault(context.getSource(), direction, Collections.singleton(context.getSource().getPlayer())))
-                    .then(argument("entities", EntityArgument.entities())
+                    .then(Commands.argument("entities", EntityArgument.entities())
                             .executes(context -> executeSetDefault(context.getSource(), direction, EntityArgument.getEntities(context, "entities")))));
 
-        LiteralArgumentBuilder<CommandSourceStack> literalRotate = literal("rotate");
+        LiteralArgumentBuilder<CommandSourceStack> literalRotate = Commands.literal("rotate");
         for (FacingDirection facingDirection : FacingDirection.values())
-            literalRotate.then(literal(facingDirection.getName())
+            literalRotate.then(Commands.literal(facingDirection.getName())
                     .executes(context -> executeRotate(context.getSource(), facingDirection, Collections.singleton(context.getSource().getPlayer())))
-                    .then(argument("entities", EntityArgument.entities())
+                    .then(Commands.argument("entities", EntityArgument.entities())
                             .executes(context -> executeRotate(context.getSource(), facingDirection, EntityArgument.getEntities(context, "entities")))));
 
-        dispatcher.register(literal("gravity").requires(source -> source.hasPermission(2))
-                .then(literal("get")
+        dispatcher.register(Commands.literal("gravity").requires(source -> source.hasPermission(2))
+                .then(Commands.literal("get")
                         .executes(context -> executeGet(context.getSource(), context.getSource().getPlayer()))
-                        .then(argument("entities", EntityArgument.entity())
+                        .then(Commands.argument("entities", EntityArgument.entity())
                                 .executes(context -> executeGet(context.getSource(), EntityArgument.getEntity(context, "entities")))))
-                .then(literal("cleargravity")
+                .then(Commands.literal("cleargravity")
                         .executes(context -> executeClearGravity(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
-                        .then(argument("entities", EntityArgument.entity())
+                        .then(Commands.argument("entities", EntityArgument.entity())
                                 .executes(context -> executeClearGravity(context.getSource(), EntityArgument.getEntities(context, "entities")))))
-                .then(literal("setdefaultstrength")
+                .then(Commands.literal("setdefaultstrength")
                         .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))
-                        .then(argument("entities", EntityArgument.entity()).then(argument("double", DoubleArgumentType.doubleArg())
+                        .then(Commands.argument("entities", EntityArgument.entity()).then(Commands.argument("double", DoubleArgumentType.doubleArg())
                                 .executes(context -> executeSetDefaultStrength(context.getSource(), DoubleArgumentType.getDouble(context, "double"), Collections.singleton(context.getSource().getPlayer())))))
-                .then(literalSet).then(literalSetDefault).then(literalRotate).then(literal("randomise")
+                .then(literalSet).then(literalSetDefault).then(literalRotate).then(Commands.literal("randomise")
                         .executes(context -> executeRandomise(context.getSource(), Collections.singleton(context.getSource().getPlayer())))
-                        .then(argument("entities", EntityArgument.entities())
+                        .then(Commands.argument("entities", EntityArgument.entities())
                                 .executes(context -> executeRandomise(context.getSource(), EntityArgument.getEntities(context, "entities")))))));
     }
 
@@ -135,7 +133,7 @@ public class GravityCommand {
             Direction combinedRelativeDirection = switch(relativeDirection) {
                 case DOWN -> Direction.DOWN;
                 case UP -> Direction.UP;
-                case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.fromHorizontal(relativeDirection.getHorizontalOffset() + Direction.fromRotation(entity.getYaw()).getHorizontal());
+                case FORWARD, BACKWARD, LEFT, RIGHT -> Direction.from2DDataValue(relativeDirection.getHorizontalOffset() + Direction.fromYRot(entity.getYRot()).get2DDataValue());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
             GravityChangerAPI.setDefaultGravityDirection(entity, newGravityDirection, new RotationParameters());

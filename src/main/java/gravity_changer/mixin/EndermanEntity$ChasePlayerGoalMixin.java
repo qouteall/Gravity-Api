@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 )
 public abstract class EndermanEntity$ChasePlayerGoalMixin {
     @Redirect(
-            method = "Lnet/minecraft/entity/mob/EndermanEntity$ChasePlayerGoal;tick()V",
+            method = "Lnet/minecraft/world/entity/monster/EnderMan$EndermanFreezeWhenLookedAt;tick()V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;getEyeY()D",

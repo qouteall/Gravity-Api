@@ -17,7 +17,7 @@ public abstract class PistonBlockEntityMixin {
             method = "Lnet/minecraft/world/level/block/piston/PistonMovingBlockEntity;moveEntityByPiston(Lnet/minecraft/core/Direction;Lnet/minecraft/world/entity/Entity;DLnet/minecraft/core/Direction;)V",
             at = @At(
                     value = "NEW",
-                    target = "(DDD)Lnet/minecraft/util/math/Vec3d;",
+                    target = "(DDD)Lnet/minecraft/world/phys/Vec3;",
                     ordinal = 0
             )
     )

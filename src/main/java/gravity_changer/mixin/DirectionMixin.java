@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = Direction.class, priority = 1001)
 public abstract class DirectionMixin {
     @WrapOperation(
-            method = "getEntityFacingOrder",
+            method = "orderedByNearest",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getYaw(F)F",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
                     ordinal = 0
             )
     )
@@ -31,10 +31,10 @@ public abstract class DirectionMixin {
     }
 
     @WrapOperation(
-            method = "getEntityFacingOrder",
+            method = "orderedByNearest",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getPitch(F)F",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
                     ordinal = 0
             )
     )
@@ -48,10 +48,10 @@ public abstract class DirectionMixin {
     }
 
     @WrapOperation(
-            method = "getLookDirectionForAxis",
+            method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getYaw(F)F",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
                     ordinal = 0
             )
     )
@@ -65,10 +65,10 @@ public abstract class DirectionMixin {
     }
 
     @WrapOperation(
-            method = "getLookDirectionForAxis",
+            method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getYaw(F)F",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
                     ordinal = 1
             )
     )
@@ -82,10 +82,10 @@ public abstract class DirectionMixin {
     }
 
     @WrapOperation(
-            method = "getLookDirectionForAxis",
+            method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getPitch(F)F",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
                     ordinal = 0
             )
     )

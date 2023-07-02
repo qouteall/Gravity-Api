@@ -29,7 +29,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
             method = "Lnet/minecraft/client/player/LocalPlayer;suffocatesAt(Lnet/minecraft/core/BlockPos;)Z",
             at = @At(
                     value = "NEW",
-                    target = "net/minecraft/world/phys/AABB",
+                    target = "(DDDDDD)Lnet/minecraft/world/phys/AABB;",
                     ordinal = 0
             )
     )

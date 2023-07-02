@@ -123,10 +123,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
 //    }
     
     @ModifyArg(
-            method = "onPlayerMove",
+            method = "handleMovePlayer",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"
+                    target = "Lnet/minecraft/server/level/ServerPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
             )
     )
     private Vec3 modify_onPlayerMove_move_1(Vec3 vec3d) {
@@ -173,10 +173,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
     //}
 
     @ModifyArg(
-            method = "onVehicleMove",
+            method = "handleMoveVehicle",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"
+                    target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
             ),
             index = 1
     )
@@ -208,10 +208,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
 
     @ModifyArgs(
-            method = "isEntityOnAir",
+            method = "noBlocksAround",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;stretch(DDD)Lnet/minecraft/util/math/Box;"
+                    target = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;"
             )
     )
     private void modify_onVehicleMove_move_0(Args args) {

@@ -16,10 +16,10 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = Shulker.class, priority = 1001)
 public abstract class ShulkerEntityMixin {
     @WrapOperation(
-            method = "moveEntities",
+            method = "onPeekAmountChange",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V",
+                    target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
                     ordinal = 0
             )
     )

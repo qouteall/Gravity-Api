@@ -17,31 +17,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Mob.class)
 public abstract class MobEntityMixin {
     @WrapOperation(
-            method = "tryAttack",
+            method = "doHurtTarget",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/mob/MobEntity;getYaw()F",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/entity/Mob;getYRot()F"
             )
     )
     private float wrapOperation_tryAttack_getYaw_0(Mob attacker, Operation<Float> original, Entity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
-        if(gravityDirection == Direction.DOWN) {
-            return original.call(attacker);
-        }
-
-        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;
-    }
-
-    @WrapOperation(
-            method = "tryAttack",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/mob/MobEntity;getYaw()F",
-                    ordinal = 1
-            )
-    )
-    private float wrapOperation_tryAttack_getYaw_1(Mob attacker, Operation<Float> original, Entity target) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return original.call(attacker);

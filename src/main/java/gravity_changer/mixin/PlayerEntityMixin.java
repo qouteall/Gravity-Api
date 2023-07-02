@@ -47,8 +47,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "travel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/entity/player/Player;getLookAngle()Lnet/minecraft/world/phys/Vec3;"
             )
     )
     private Vec3 wrapOperation_travel_getRotationVector_0(Player playerEntity, Operation<Vec3> original) {
@@ -65,8 +64,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         method = "travel",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/util/math/BlockPos;ofFloored(DDD)Lnet/minecraft/util/math/BlockPos;",
-            ordinal = 0
+            target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"
         )
     )
     private void modify_move_multiply_0(Args args) {
@@ -97,7 +95,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "Lnet/minecraft/world/entity/player/Player;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(
                     value = "NEW",
-                    target = "net/minecraft/world/entity/item/ItemEntity",
+                    target = "(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;",
                     ordinal = 0
             )
     )
@@ -113,10 +111,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @WrapOperation(
-            method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
+            method = "Lnet/minecraft/world/entity/player/Player;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/ItemEntity;setVelocity(DDD)V"
+                    target = "Lnet/minecraft/world/entity/item/ItemEntity;setDeltaMovement(DDD)V"
             )
     )
     private void wrapOperation_dropItem_setVelocity(ItemEntity itemEntity, double x, double y, double z, Operation<Void> original) {
@@ -192,11 +190,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @WrapOperation(
-            method = "method_30263",
+            method = "isAboveGround",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;"
             )
     )
     private AABB wrapOperation_method_30263_offset_0(AABB box, double x, double y, double z, Operation<AABB> original) {
@@ -213,8 +210,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "attack",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/entity/player/Player;getYRot()F",
+                ordinal = 0
             )
     )
     private float wrapOperation_attack_getYaw_0(Player attacker, Operation<Float> original, Entity target) {
@@ -231,7 +228,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "attack",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F",
+                    target = "Lnet/minecraft/world/entity/player/Player;getYRot()F",
                     ordinal = 1
             )
     )
@@ -249,7 +246,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "attack",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F",
+                    target = "Lnet/minecraft/world/entity/player/Player;getYRot()F",
                     ordinal = 2
             )
     )
@@ -266,7 +263,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             method = "attack",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F",
+                    target = "Lnet/minecraft/world/entity/player/Player;getYRot()F",
                     ordinal = 3
             )
     )
@@ -280,11 +277,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @ModifyArgs(
-            method = "spawnParticles",
+            method = "addParticlesAroundSelf",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
             )
     )
     private void modify_addDeathParticless_addParticle_0(Args args) {
@@ -298,32 +294,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @ModifyArgs(
-            method = "tickMovement",
+            method = "aiStep",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;expand(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"
             )
     )
     private void modify_tickMovement_expand_0(Args args) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
-        if(gravityDirection == Direction.DOWN) return;
-
-        Vec3 vec3d = RotationUtil.maskPlayerToWorld(args.get(0), args.get(1), args.get(2), gravityDirection);
-        args.set(0, vec3d.x);
-        args.set(1, vec3d.y);
-        args.set(2, vec3d.z);
-    }
-
-    @ModifyArgs(
-            method = "tickMovement",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;expand(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 1
-            )
-    )
-    private void modify_tickMovement_expand_1(Args args) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
         if(gravityDirection == Direction.DOWN) return;
 

@@ -35,10 +35,10 @@ public abstract class EntityRenderMixin {
 
 
     @ModifyExpressionValue(
-            method = "renderLabelIfPresent",
+            method = "renderNameTag",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRotation()Lorg/joml/Quaternionf;",
+                    target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;cameraOrientation()Lorg/joml/Quaternionf;",
                     ordinal = 0
             )
     )

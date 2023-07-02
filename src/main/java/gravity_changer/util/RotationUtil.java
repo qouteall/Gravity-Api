@@ -3,7 +3,6 @@ package gravity_changer.util;
 import com.mojang.math.Axis;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.util.math.*;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -47,12 +46,12 @@ public abstract class RotationUtil {
 
     public static Vec3 vecWorldToPlayer(double x, double y, double z, Direction gravityDirection) {
         return switch(gravityDirection) {
-            case DOWN  -> new Vec3d( x,  y,  z);
-            case UP    -> new Vec3d(-x, -y,  z);
-            case NORTH -> new Vec3d( x,  z, -y);
-            case SOUTH -> new Vec3d(-x, -z, -y);
-            case WEST  -> new Vec3d(-z,  x, -y);
-            case EAST  -> new Vec3d( z, -x, -y);
+            case DOWN  -> new Vec3( x,  y,  z);
+            case UP    -> new Vec3(-x, -y,  z);
+            case NORTH -> new Vec3( x,  z, -y);
+            case SOUTH -> new Vec3(-x, -z, -y);
+            case WEST  -> new Vec3(-z,  x, -y);
+            case EAST  -> new Vec3( z, -x, -y);
         };
     }
 
@@ -62,12 +61,12 @@ public abstract class RotationUtil {
 
     public static Vec3 vecPlayerToWorld(double x, double y, double z, Direction gravityDirection) {
         return switch(gravityDirection) {
-            case DOWN  -> new Vec3d( x,  y,  z);
-            case UP    -> new Vec3d(-x, -y,  z);
-            case NORTH -> new Vec3d( x, -z,  y);
-            case SOUTH -> new Vec3d(-x, -z, -y);
-            case WEST  -> new Vec3d( y, -z, -x);
-            case EAST  -> new Vec3d(-y, -z,  x);
+            case DOWN  -> new Vec3( x,  y,  z);
+            case UP    -> new Vec3(-x, -y,  z);
+            case NORTH -> new Vec3( x, -z,  y);
+            case SOUTH -> new Vec3(-x, -z, -y);
+            case WEST  -> new Vec3( y, -z, -x);
+            case EAST  -> new Vec3(-y, -z,  x);
         };
     }
 
@@ -107,9 +106,9 @@ public abstract class RotationUtil {
 
     public static Vec3 maskWorldToPlayer(double x, double y, double z, Direction gravityDirection) {
         return switch(gravityDirection) {
-            case DOWN , UP    -> new Vec3d(x, y, z);
-            case NORTH, SOUTH -> new Vec3d(x, z, y);
-            case WEST , EAST  -> new Vec3d(z, x, y);
+            case DOWN , UP    -> new Vec3(x, y, z);
+            case NORTH, SOUTH -> new Vec3(x, z, y);
+            case WEST , EAST  -> new Vec3(z, x, y);
         };
     }
 
@@ -119,9 +118,9 @@ public abstract class RotationUtil {
 
     public static Vec3 maskPlayerToWorld(double x, double y, double z, Direction gravityDirection) {
         return switch(gravityDirection) {
-            case DOWN , UP    -> new Vec3d(x, y, z);
-            case NORTH, SOUTH -> new Vec3d(x, z, y);
-            case WEST , EAST  -> new Vec3d(y, z, x);
+            case DOWN , UP    -> new Vec3(x, y, z);
+            case NORTH, SOUTH -> new Vec3(x, z, y);
+            case WEST , EAST  -> new Vec3(y, z, x);
         };
     }
 

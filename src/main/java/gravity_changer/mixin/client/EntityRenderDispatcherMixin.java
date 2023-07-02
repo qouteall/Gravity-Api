@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.util.math.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -29,6 +28,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
@@ -168,7 +168,7 @@ public abstract class EntityRenderDispatcherMixin {
             method = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;renderHitbox(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/entity/Entity;F)V",
             at = @At(
                     value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;",
+                    target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;",
                     ordinal = 0
             ),
             ordinal = 0
@@ -182,21 +182,21 @@ public abstract class EntityRenderDispatcherMixin {
         return RotationUtil.boxWorldToPlayer(box, gravityDirection);
     }
 
-    @ModifyVariable(
+    @Redirect(
             method = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;renderHitbox(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/entity/Entity;F)V",
             at = @At(
-                    value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;",
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Entity;getViewVector(F)Lnet/minecraft/world/phys/Vec3;",
                     ordinal = 0
-            ),
-            ordinal = 0
+            )
     )
-    private static Vec3 modify_renderHitbox_Vec3d_0(Vec3 vec3d, PoseStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static Vec3 redirectViewVector(Entity instance, float partialTicks) {
+        Vec3 viewVector = instance.getViewVector(partialTicks);
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if(gravityDirection == Direction.DOWN) {
-            return vec3d;
+            return viewVector;
         }
 
-        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+        return RotationUtil.vecWorldToPlayer(viewVector, gravityDirection);
     }
 }

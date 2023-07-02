@@ -18,7 +18,7 @@ public abstract class ServerPlayerEntityMixin {
             method = "Lnet/minecraft/server/level/ServerPlayer;changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
                     ordinal = 1,
                     shift = At.Shift.AFTER
             )
@@ -36,7 +36,7 @@ public abstract class ServerPlayerEntityMixin {
             method = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
                     ordinal = 0,
                     shift = At.Shift.AFTER
             )
@@ -55,8 +55,7 @@ public abstract class ServerPlayerEntityMixin {
             at = @At("TAIL")
     )
     private void inject_copyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
-        if(GravityChangerMod.config.resetGravityOnRespawn) {
-        } else {
+        if (!GravityChangerMod.config.resetGravityOnRespawn) {
             GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
         }
     }

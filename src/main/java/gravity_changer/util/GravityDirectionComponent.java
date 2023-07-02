@@ -5,7 +5,6 @@ import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.config.GravityChangerConfig;
 import net.minecraft.core.Direction;
-import net.minecraft.entity.projectile.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;

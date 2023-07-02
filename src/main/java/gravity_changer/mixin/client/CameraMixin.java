@@ -40,10 +40,10 @@ public abstract class CameraMixin {
     }
 
     @WrapOperation(
-            method = "update",
+            method = "setup",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V",
+                    target = "Lnet/minecraft/client/Camera;setPosition(DDD)V",
                     ordinal = 0
             )
     )
@@ -85,7 +85,8 @@ public abstract class CameraMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;",
-                    shift = At.Shift.AFTER
+                    shift = At.Shift.AFTER,
+                remap = false
             )
     )
     private void inject_setRotation(CallbackInfo ci) {

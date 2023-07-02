@@ -68,10 +68,10 @@ public abstract class ExplosionMixin {
     }
 
     @WrapOperation(
-            method = "collectBlocksAndDamageEntities",
+            method = "explode",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getVelocity()Lnet/minecraft/util/math/Vec3d;",
+                    target = "Lnet/minecraft/world/entity/Entity;getDeltaMovement()Lnet/minecraft/world/phys/Vec3;",
                     ordinal = 0
             )
     )
@@ -85,10 +85,10 @@ public abstract class ExplosionMixin {
     }
 
     @WrapOperation(
-            method = "collectBlocksAndDamageEntities",
+            method = "explode",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
+                    target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V",
                     ordinal = 0
             )
     )
