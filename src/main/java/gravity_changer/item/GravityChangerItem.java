@@ -12,15 +12,15 @@ import net.minecraft.world.level.Level;
 
 public class GravityChangerItem extends Item {
     public final Direction gravityDirection;
-
+    
     public GravityChangerItem(Properties settings, Direction _gravityDirection) {
         super(settings);
         gravityDirection = _gravityDirection;
     }
-
+    
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
-        if(!world.isClientSide())
+        if (!world.isClientSide())
             GravityChangerAPI.setDefaultGravityDirection(user, gravityDirection, new RotationParameters());
         return InteractionResultHolder.success(user.getItemInHand(hand));
     }

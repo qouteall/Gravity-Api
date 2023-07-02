@@ -12,33 +12,33 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BiomeAmbientSoundsHandler.class)
 public abstract class BiomeEffectSoundPlayerMixin {
     @Redirect(
-            method = "method_26271",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/player/LocalPlayer;getEyeY()D"
-            )
+        method = "method_26271",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/player/LocalPlayer;getEyeY()D"
+        )
     )
     private double redirect_method_26271_getEyeY_0(LocalPlayer clientPlayerEntity) {
         return clientPlayerEntity.getEyePosition().y;
     }
-
+    
     @Redirect(
-            method = "method_26271",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/player/LocalPlayer;getX()D"
-            )
+        method = "method_26271",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/player/LocalPlayer;getX()D"
+        )
     )
     private double redirect_method_26271_getX_0(LocalPlayer clientPlayerEntity) {
         return clientPlayerEntity.getEyePosition().x;
     }
-
+    
     @Redirect(
-            method = "method_26271",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/player/LocalPlayer;getZ()D"
-            )
+        method = "method_26271",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/player/LocalPlayer;getZ()D"
+        )
     )
     private double redirect_method_26271_getZ_0(LocalPlayer clientPlayerEntity) {
         return clientPlayerEntity.getEyePosition().z;

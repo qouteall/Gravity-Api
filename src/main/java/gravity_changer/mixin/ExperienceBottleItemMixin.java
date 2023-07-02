@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ExperienceBottleItem.class)
 public abstract class ExperienceBottleItemMixin extends Item {
-
+    
     public ExperienceBottleItemMixin(Properties settings) {
         super(settings);
     }

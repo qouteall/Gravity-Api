@@ -14,87 +14,87 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = Direction.class, priority = 1001)
 public abstract class DirectionMixin {
     @WrapOperation(
-            method = "orderedByNearest",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
-                    ordinal = 0
-            )
+        method = "orderedByNearest",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
+            ordinal = 0
+        )
     )
     private static float wrapOperation_getEntityFacingOrder_getYaw_0(Entity entity, float tickDelta, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return original.call(entity, tickDelta);
         }
-
+        
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
-
+    
     @WrapOperation(
-            method = "orderedByNearest",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
-                    ordinal = 0
-            )
+        method = "orderedByNearest",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
+            ordinal = 0
+        )
     )
     private static float wrapOperation_getEntityFacingOrder_getPitch_0(Entity entity, float tickDelta, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return original.call(entity, tickDelta);
         }
-
+        
         return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
     }
-
+    
     @WrapOperation(
-            method = "getFacingAxis",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
-                    ordinal = 0
-            )
+        method = "getFacingAxis",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
+            ordinal = 0
+        )
     )
     private static float wrapOperation_getLookDirectionForAxis_getYaw_0(Entity entity, float tickDelta, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return original.call(entity, tickDelta);
         }
-
+        
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
-
+    
     @WrapOperation(
-            method = "getFacingAxis",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
-                    ordinal = 1
-            )
+        method = "getFacingAxis",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F",
+            ordinal = 1
+        )
     )
     private static float wrapOperation_getLookDirectionForAxis_getYaw_1(Entity entity, float tickDelta, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return original.call(entity, tickDelta);
         }
-
+        
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
-
+    
     @WrapOperation(
-            method = "getFacingAxis",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
-                    ordinal = 0
-            )
+        method = "getFacingAxis",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F",
+            ordinal = 0
+        )
     )
     private static float wrapOperation_getLookDirectionForAxis_getPitch_0(Entity entity, float tickDelta, Operation<Float> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return original.call(entity, tickDelta);
         }
-
+        
         return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
     }
 }

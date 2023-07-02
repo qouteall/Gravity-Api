@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class FishingBobberEntityMixin extends Entity {
     
     
-    
     public FishingBobberEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }

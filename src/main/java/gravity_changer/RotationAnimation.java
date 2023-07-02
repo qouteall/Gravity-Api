@@ -90,7 +90,7 @@ public class RotationAnimation {
             Vec3.atLowerCornerOf(prevGravity.getNormal()),
             Vec3.atLowerCornerOf(newGravity.getNormal())
         );
-    
+        
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x, (float) oldLookingDirection.y, (float) oldLookingDirection.z);
         lookingDirection.rotate(deltaRotation);
         Vec3 newLookingDirection = new Vec3(lookingDirection);

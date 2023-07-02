@@ -30,7 +30,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 
 public abstract class GravityChangerAPI {
     public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
-            ComponentRegistry.getOrCreate(new ResourceLocation("gravityapi", "gravity_direction"), GravityComponent.class);
+        ComponentRegistry.getOrCreate(new ResourceLocation("gravityapi", "gravity_direction"), GravityComponent.class);
 
 //    public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH_COMPONENT =
 //            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
@@ -46,7 +46,7 @@ public abstract class GravityChangerAPI {
         }
         return Optional.empty();
     }
-
+    
     /**
      * Returns the applied gravity direction for the given player
      * This is the direction that directly affects everything this mod changes
@@ -59,21 +59,21 @@ public abstract class GravityChangerAPI {
         }
         return Direction.DOWN;
     }
-
+    
     public static ArrayList<Gravity> getGravityList(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravity).orElse(new ArrayList<Gravity>());
         }
         return new ArrayList<Gravity>();
     }
-
+    
     public static Direction getPrevGravtityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getPrevGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
     }
-
+    
     /**
      * Returns the main gravity direction for the given player
      * This may not be the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
@@ -84,49 +84,48 @@ public abstract class GravityChangerAPI {
         }
         return Direction.DOWN;
     }
-
+    
     public static double getDefaultGravityStrength(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getDefaultGravityStrength).orElse(1d);
         }
         return 1;
     }
-
-
-
+    
+    
     public static double getGravityStrength(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityStrength).orElse(1d);
         }
         return 1d;
     }
-
+    
     public static double getDimensionGravityStrength(Level world) {
         return 1;
 //        return maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).map(GravityDimensionStrengthInterface::getDimensionGravityStrength).orElse(1d);
     }
-
+    
     public static Direction getActualGravityDirection(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getActualGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;
     }
-
+    
     public static boolean getIsInverted(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getInvertGravity).orElse(false);
         }
         return false;
     }
-
+    
     public static Optional<RotationAnimation> getGravityAnimation(Entity entity) {
         if (EntityTags.canChangeGravity(entity)) {
             return maybeGetSafe(GRAVITY_COMPONENT, entity).map(GravityComponent::getGravityAnimation);
         }
         return Optional.empty();
     }
-
+    
     /**
      * Sets the main gravity direction for the given player
      * If the player is a ServerPlayerEntity and gravity direction changed also syncs the direction to the clients
@@ -134,7 +133,7 @@ public abstract class GravityChangerAPI {
      * This may not immediately change the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
      */
     public static void addGravity(Entity entity, Gravity gravity) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
@@ -143,10 +142,10 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     @Environment(EnvType.CLIENT)
     public static void addGravityClient(LocalPlayer entity, Gravity gravity, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
-        if(onCorrectSide(entity, false)) {
+        if (onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.addGravity(gravity, false);
@@ -155,23 +154,23 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     /**
-    * Update gravity should always be automatically called when you call any api function
-    * that could result in a gravityDirection change.
-    * */
+     * Update gravity should always be automatically called when you call any api function
+     * that could result in a gravityDirection change.
+     */
     public static void updateGravity(Entity entity) {
         updateGravity(entity, new RotationParameters());
     }
-
+    
     public static void updateGravity(Entity entity, RotationParameters rotationParameters) {
         if (EntityTags.canChangeGravity(entity)) {
-            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(rotationParameters,false));
+            maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> gc.updateGravity(rotationParameters, false));
         }
     }
-
+    
     public static void setGravity(Entity entity, ArrayList<Gravity> gravity) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setGravity(gravity, false);
@@ -180,9 +179,10 @@ public abstract class GravityChangerAPI {
             }
         }
     }
+    
     @Environment(EnvType.CLIENT)
     public static void setGravityClient(LocalPlayer entity, ArrayList<Gravity> gravity, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
-        if(onCorrectSide(entity, false)) {
+        if (onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setGravity(gravity, false);
@@ -191,13 +191,13 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
-    public static void setIsInverted(Entity entity, boolean isInverted){
+    
+    public static void setIsInverted(Entity entity, boolean isInverted) {
         setIsInverted(entity, isInverted, new RotationParameters());
     }
-
+    
     public static void setIsInverted(Entity entity, boolean isInverted, RotationParameters rotationParameters) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
@@ -206,9 +206,9 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     public static void setDefualtGravityStrength(Entity entity, double strength) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityStrength(strength);
@@ -217,15 +217,15 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     public static void setDimensionGravityStrength(Level world, double strength) {
         throw new NotImplementedException();
 //        maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).ifPresent(component -> component.setDimensionGravityStrength(strength));
     }
-
+    
     @Environment(EnvType.CLIENT)
     public static void setIsInvertedClient(LocalPlayer entity, boolean isInverted, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
-        if(onCorrectSide(entity, false)) {
+        if (onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.invertGravity(isInverted, rotationParameters, false);
@@ -234,24 +234,25 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
-    public static void clearGravity(Entity entity){
+    
+    public static void clearGravity(Entity entity) {
         clearGravity(entity, new RotationParameters());
     }
-
+    
     public static void clearGravity(Entity entity, RotationParameters rotationParameters) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.clearGravity(rotationParameters, false);
-                    GravityChannel.OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket( new ArrayList<>(), false), NetworkUtil.PacketMode.EVERYONE);
+                    GravityChannel.OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(new ArrayList<>(), false), NetworkUtil.PacketMode.EVERYONE);
                 });
             }
         }
     }
+    
     @Environment(EnvType.CLIENT)
     public static void clearGravityClient(LocalPlayer entity, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
-        if(onCorrectSide(entity, false)) {
+        if (onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.clearGravity(rotationParameters, false);
@@ -260,18 +261,18 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     @Deprecated
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, int animationDurationMs) {
         setDefaultGravityDirection(entity, gravityDirection, new RotationParameters().rotationTime(animationDurationMs));
     }
-
+    
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection) {
         setDefaultGravityDirection(entity, gravityDirection, new RotationParameters());
     }
-
+    
     public static void setDefaultGravityDirection(Entity entity, Direction gravityDirection, RotationParameters rotationParameters) {
-        if(onCorrectSide(entity, true)) {
+        if (onCorrectSide(entity, true)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
@@ -280,9 +281,10 @@ public abstract class GravityChangerAPI {
             }
         }
     }
+    
     @Environment(EnvType.CLIENT)
     public static void setDefaultGravityDirectionClient(LocalPlayer entity, Direction gravityDirection, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
-        if(onCorrectSide(entity, false)) {
+        if (onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
                     gc.setDefaultGravityDirection(gravityDirection, rotationParameters, false);
@@ -291,12 +293,12 @@ public abstract class GravityChangerAPI {
             }
         }
     }
-
+    
     /**
      * For internal use only, direct calls on GravityComponent will cause de-sync between client and server.
      */
     @Nullable
-    public static GravityComponent getGravityComponent(Entity entity){
+    public static GravityComponent getGravityComponent(Entity entity) {
         return maybeGetSafe(GRAVITY_COMPONENT, entity).orElse(null);
     }
     
@@ -307,7 +309,7 @@ public abstract class GravityChangerAPI {
     public static Vec3 getWorldVelocity(Entity playerEntity) {
         return RotationUtil.vecPlayerToWorld(playerEntity.getDeltaMovement(), getGravityDirection(playerEntity));
     }
-
+    
     /**
      * Sets the world relative velocity for the given player
      * Using minecraft's methods to set the velocity of an entity will set player relative velocity
@@ -315,20 +317,20 @@ public abstract class GravityChangerAPI {
     public static void setWorldVelocity(Entity entity, Vec3 worldVelocity) {
         entity.setDeltaMovement(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
     }
-
+    
     /**
      * Returns eye position offset from feet position for the given entity
      */
     public static Vec3 getEyeOffset(Entity entity) {
         return RotationUtil.vecPlayerToWorld(0, (double) entity.getEyeHeight(), 0, getGravityDirection(entity));
     }
-
-    private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
-        if(entity.level().isClientSide && shouldBeOnServer) {
+    
+    private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer) {
+        if (entity.level().isClientSide && shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
             return false;
         }
-        if(!entity.level().isClientSide && !shouldBeOnServer) {
+        if (!entity.level().isClientSide && !shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
             return false;
         }

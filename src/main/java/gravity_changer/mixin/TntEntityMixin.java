@@ -14,6 +14,7 @@ public abstract class TntEntityMixin extends Entity {
     public TntEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
+    
     @ModifyArg(
         method = "tick",
         at = @At(

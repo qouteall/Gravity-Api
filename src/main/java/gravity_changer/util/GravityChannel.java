@@ -26,41 +26,41 @@ public class GravityChannel<P extends GravityPacket> {
     public static GravityChannel<DefaultGravityPacket> DEFAULT_GRAVITY = new GravityChannel<>(DefaultGravityPacket::new, GravityChangerMod.id("default_gravity"));
     public static GravityChannel<DefaultGravityStrengthPacket> DEFAULT_GRAVITY_STRENGTH = new GravityChannel<>(DefaultGravityStrengthPacket::new, GravityChangerMod.id("default_gravity_strength"));
     public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.id("inverted"));
-
+    
     private final Factory<P> packetFactory;
     private final ResourceLocation channel;
     private final GravityVerifierRegistry<P> gravityVerifierRegistry;
-
-    GravityChannel(Factory<P> _packetFactory, ResourceLocation _channel){
+    
+    GravityChannel(Factory<P> _packetFactory, ResourceLocation _channel) {
         packetFactory = _packetFactory;
         channel = _channel;
         gravityVerifierRegistry = new GravityVerifierRegistry<>();
     }
-
-    public void sendToClient(Entity entity, P packet, PacketMode mode){
+    
+    public void sendToClient(Entity entity, P packet, PacketMode mode) {
         FriendlyByteBuf buf = PacketByteBufs.create();
         buf.writeInt(entity.getId());
         packet.write(buf);
         sendToTracking(entity, channel, buf, mode);
     }
-
-    public void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender){
+    
+    public void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
         int entityId = buf.readInt();
         P packet = packetFactory.read(buf);
         client.execute(() -> {
             getGravityComponent(client, entityId).ifPresent(packet::run);
         });
     }
-
-    public void sendToServer(P packet, ResourceLocation verifier, FriendlyByteBuf verifierInfoBuf){
+    
+    public void sendToServer(P packet, ResourceLocation verifier, FriendlyByteBuf verifierInfoBuf) {
         FriendlyByteBuf buf = PacketByteBufs.create();
         packet.write(buf);
         buf.writeResourceLocation(verifier);
         buf.writeByteArray(verifierInfoBuf.array());
         ClientPlayNetworking.send(channel, buf);
     }
-
-    public void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
+    
+    public void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
         P packet = packetFactory.read(buf);
         ResourceLocation verifier = buf.readResourceLocation();
         FriendlyByteBuf verifierInfoBuf = PacketByteBufs.create();
@@ -71,15 +71,16 @@ public class GravityChannel<P extends GravityPacket> {
                 if (v != null && v.check(player, verifierInfoBuf, packet)) {
                     packet.run(gc);
                     sendToClient(player, packet, PacketMode.EVERYONE_BUT_SELF);
-                }else {
+                }
+                else {
                     GravityChangerMod.LOGGER.info("VerifierFunction returned FALSE");
                     sendFullStatePacket(player, PacketMode.ONLY_SELF, packet.getRotationParameters(), false);
                 }
             });
         });
     }
-
-    public static void sendFullStatePacket(Entity entity, PacketMode mode, RotationParameters rp, boolean initialGravity){
+    
+    public static void sendFullStatePacket(Entity entity, PacketMode mode, RotationParameters rp, boolean initialGravity) {
         getGravityComponent(entity).ifPresent(gc -> {
             OVERWRITE_GRAVITY.sendToClient(entity, new OverwriteGravityPacket(gc.getGravity(), initialGravity), mode);
             DEFAULT_GRAVITY.sendToClient(entity, new DefaultGravityPacket(gc.getDefaultGravityDirection(), rp, initialGravity), mode);
@@ -87,19 +88,19 @@ public class GravityChannel<P extends GravityPacket> {
             DEFAULT_GRAVITY_STRENGTH.sendToClient(entity, new DefaultGravityStrengthPacket(gc.getGravityStrength()), mode);
         });
     }
-
-    public GravityVerifierRegistry<P> getVerifierRegistry(){
+    
+    public GravityVerifierRegistry<P> getVerifierRegistry() {
         return gravityVerifierRegistry;
     }
-
-    public void registerClientReceiver(){
+    
+    public void registerClientReceiver() {
         ClientPlayNetworking.registerGlobalReceiver(channel, this::receiveFromServer);
     }
-
-    public void registerServerReceiver(){
+    
+    public void registerServerReceiver() {
         ServerPlayNetworking.registerGlobalReceiver(channel, this::receiveFromClient);
     }
-
+    
     public static void initClient() {
         DEFAULT_GRAVITY.registerClientReceiver();
         UPDATE_GRAVITY.registerClientReceiver();
@@ -107,7 +108,7 @@ public class GravityChannel<P extends GravityPacket> {
         INVERT_GRAVITY.registerClientReceiver();
         DEFAULT_GRAVITY_STRENGTH.registerClientReceiver();
     }
-
+    
     public static void initServer() {
         DEFAULT_GRAVITY.registerServerReceiver();
         UPDATE_GRAVITY.registerServerReceiver();
@@ -115,7 +116,7 @@ public class GravityChannel<P extends GravityPacket> {
         INVERT_GRAVITY.registerServerReceiver();
         DEFAULT_GRAVITY_STRENGTH.registerServerReceiver();
     }
-
+    
     @FunctionalInterface
     interface Factory<T extends GravityPacket> {
         T read(FriendlyByteBuf buf);

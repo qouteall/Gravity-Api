@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(value = ThrowablePotionItem.class, priority = 1001)
 public abstract class ThrowablePotionItemMixin extends PotionItem {
-
+    
     public ThrowablePotionItemMixin(Properties settings) {
         super(settings);
     }

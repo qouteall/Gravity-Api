@@ -18,31 +18,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ScreenEffectRenderer.class)
 public abstract class InGameOverlayRendererMixin {
     @Inject(
-            method = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;getViewBlockingState(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;",
-            at = @At("HEAD"),
-            cancellable = true
+        method = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;getViewBlockingState(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;",
+        at = @At("HEAD"),
+        cancellable = true
     )
     private static void inject_getInWallBlockState(Player player, CallbackInfoReturnable<BlockState> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
-        if(gravityDirection == Direction.DOWN) return;
-
+        if (gravityDirection == Direction.DOWN) return;
+        
         cir.cancel();
-
+        
         BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
-
+        
         Vec3 eyePos = player.getEyePosition();
         Vector3f multipliers = RotationUtil.vecPlayerToWorld(player.getBbWidth() * 0.8F, 0.1F, player.getBbWidth() * 0.8F, gravityDirection);
-        for(int i = 0; i < 8; ++i) {
-            double d = eyePos.x + (double)(((float)((i >> 0) % 2) - 0.5F) * multipliers.x());
-            double e = eyePos.y + (double)(((float)((i >> 1) % 2) - 0.5F) * multipliers.y());
-            double f = eyePos.z + (double)(((float)((i >> 2) % 2) - 0.5F) * multipliers.z());
+        for (int i = 0; i < 8; ++i) {
+            double d = eyePos.x + (double) (((float) ((i >> 0) % 2) - 0.5F) * multipliers.x());
+            double e = eyePos.y + (double) (((float) ((i >> 1) % 2) - 0.5F) * multipliers.y());
+            double f = eyePos.z + (double) (((float) ((i >> 2) % 2) - 0.5F) * multipliers.z());
             mutable.set(d, e, f);
             BlockState blockState = player.level().getBlockState(mutable);
             if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.isViewBlocking(player.level(), mutable)) {
                 cir.setReturnValue(blockState);
             }
         }
-
+        
         cir.setReturnValue(null);
     }
 }

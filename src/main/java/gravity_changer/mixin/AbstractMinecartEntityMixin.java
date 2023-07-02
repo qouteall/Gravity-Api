@@ -14,7 +14,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
     public AbstractMinecartEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
-
+    
     @ModifyArg(
         method = "tick",
         at = @At(

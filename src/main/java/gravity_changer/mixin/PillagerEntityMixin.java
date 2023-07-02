@@ -18,28 +18,28 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Pillager.class)
 public abstract class PillagerEntityMixin implements CrossbowAttackMob {
     @Redirect(
-            method = "Lnet/minecraft/world/entity/monster/Pillager;shootCrossbowProjectile(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/projectile/Projectile;F)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/monster/Pillager;shootCrossbowProjectile(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/projectile/Projectile;FF)V",
-                    ordinal = 0
-            )
+        method = "Lnet/minecraft/world/entity/monster/Pillager;shootCrossbowProjectile(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/projectile/Projectile;F)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/monster/Pillager;shootCrossbowProjectile(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/projectile/Projectile;FF)V",
+            ordinal = 0
+        )
     )
     private void redirect_shoot_shoot_0(Pillager pillagerEntity, LivingEntity entity, LivingEntity target, Projectile projectile, float multishotSpray, float speed) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             this.shootCrossbowProjectile(entity, target, projectile, multishotSpray, speed);
             return;
         }
-
+        
         Vec3 targetPos = target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection));
-
+        
         double d = targetPos.x - entity.getX();
         double e = targetPos.z - entity.getZ();
         double f = Math.sqrt(Math.sqrt(d * d + e * e));
         double g = targetPos.y - projectile.getY() + f * 0.20000000298023224D;
         Vector3f vec3f = this.getProjectileShotVector(entity, new Vec3(d, g, e), multishotSpray);
-        projectile.shoot((double)vec3f.x(), (double)vec3f.y(), (double)vec3f.z(), speed, (float)(14 - entity.level().getDifficulty().getId() * 4));
+        projectile.shoot((double) vec3f.x(), (double) vec3f.y(), (double) vec3f.z(), speed, (float) (14 - entity.level().getDifficulty().getId() * 4));
         entity.playSound(SoundEvents.CROSSBOW_SHOOT, 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 }

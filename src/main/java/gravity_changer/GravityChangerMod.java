@@ -32,15 +32,15 @@ public class GravityChangerMod implements ModInitializer {
     public void onInitialize() {
         ModItems.init();
         GravityChannel.initServer();
-
+        
         AutoConfig.register(GravityChangerConfig.class, GsonConfigSerializer::new);
         configHolder = AutoConfig.getConfigHolder(GravityChangerConfig.class);
         config = configHolder.getConfig();
-
+        
         CommandRegistrationCallback.EVENT.register(
             (dispatcher, registryAccess, environment) -> GravityCommand.register(dispatcher)
         );
-    
+        
         GravityChangerGroup = FabricItemGroup.builder()
             .icon(() -> new ItemStack(ModItems.GRAVITY_CHANGER_UP))
             .displayItems((enabledFeatures, entries) -> {
@@ -60,13 +60,13 @@ public class GravityChangerMod implements ModInitializer {
             })
             .title(Component.translatable("itemGroup.gravity_changer"))
             .build();
-    
+        
         Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB, id("general"),
             GravityChangerGroup
         );
     }
-
+    
     public static ResourceLocation id(String path) {
         return new ResourceLocation(NAMESPACE, path);
     }

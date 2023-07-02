@@ -16,15 +16,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(FireworkRocketEntity.class)
-public abstract class FireworkRocketEntityMixin extends Entity{
-
-    @Shadow private @Nullable LivingEntity attachedToEntity;
-
-
+public abstract class FireworkRocketEntityMixin extends Entity {
+    
+    @Shadow
+    private @Nullable LivingEntity attachedToEntity;
+    
+    
     public FireworkRocketEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
-
+    
     /*@Override
     public Direction gravitychanger$getAppliedGravityDirection() {
         Entity vehicle = this.getVehicle();
@@ -35,34 +36,34 @@ public abstract class FireworkRocketEntityMixin extends Entity{
         return GravityChangerAPI.getGravityDirection((FireworkRocketEntity)(Object)this);
     }*/
     @ModifyVariable(
-            method = "Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;tick()V",
-            at = @At(
-                    value = "STORE"
-            )
-            ,ordinal = 0
+        method = "Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;tick()V",
+        at = @At(
+            value = "STORE"
+        )
+        , ordinal = 0
     )
     public Vec3 tick(Vec3 value) {
-        if(attachedToEntity != null) {
+        if (attachedToEntity != null) {
             value = RotationUtil.vecWorldToPlayer(value, GravityChangerAPI.getGravityDirection(attachedToEntity));
         }
         return value;
     }
-
-   // @ModifyVariable(
-   //         method = "tick",
-   //         at = @At(
-   //                 value = "INVOKE_ASSIGN",
-   //                 target = "Lnet/minecraft/entity/LivingEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;",
-   //                 ordinal = 0
-   //         )
-   // )
-   // private Vec3d modify_tick_Vec3d_0(Vec3d vec3d) {
-   //     assert this.shooter != null;
-   //     Direction gravityDirection = ((EntityAccessor) this.shooter).gravitychanger$getAppliedGravityDirection();
-   //     if(gravityDirection == Direction.DOWN) {
-   //         return vec3d;
-   //     }
+    
+    // @ModifyVariable(
+    //         method = "tick",
+    //         at = @At(
+    //                 value = "INVOKE_ASSIGN",
+    //                 target = "Lnet/minecraft/entity/LivingEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;",
+    //                 ordinal = 0
+    //         )
+    // )
+    // private Vec3d modify_tick_Vec3d_0(Vec3d vec3d) {
+    //     assert this.shooter != null;
+    //     Direction gravityDirection = ((EntityAccessor) this.shooter).gravitychanger$getAppliedGravityDirection();
+    //     if(gravityDirection == Direction.DOWN) {
+    //         return vec3d;
+    //     }
 //
-   //     return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
-   // }
+    //     return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    // }
 }

@@ -17,20 +17,20 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = ShulkerBoxBlockEntity.class, priority = 1001)
 public abstract class ShulkerBoxBlockEntityMixin {
     @WrapOperation(
-            method = "moveCollidedEntities",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
-                    ordinal = 0
-            )
+        method = "moveCollidedEntities",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
+            ordinal = 0
+        )
     )
     private void wrapOperation_pushEntities_move_0(Entity entity, MoverType movementType, Vec3 vec3d, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             original.call(entity, movementType, vec3d);
             return;
         }
-
+        
         original.call(entity, movementType, RotationUtil.vecWorldToPlayer(vec3d, gravityDirection));
     }
 }

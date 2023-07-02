@@ -16,23 +16,24 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = RamTarget.class, priority = 1001)
 public abstract class RamImpactTaskMixin {
-    @Shadow private Vec3 ramDirection;
-
+    @Shadow
+    private Vec3 ramDirection;
+    
     @WrapOperation(
-            method = "tick",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V",
-                    ordinal = 0
-            )
+        method = "tick",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V",
+            ordinal = 0
+        )
     )
     private void wrapOperation_keepRunning_takeKnockback_0(LivingEntity target, double strength, double x, double z, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             original.call(target, strength, x, z);
             return;
         }
-
+        
         Vec3 direction = RotationUtil.vecWorldToPlayer(this.ramDirection, gravityDirection);
         original.call(target, strength, direction.x, direction.z);
     }

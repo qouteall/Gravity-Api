@@ -32,19 +32,19 @@ public abstract class EntityRenderMixin {
     //    quaternion.hamiltonProduct(entityRenderDispatcher.getRotation().copy());
     //    return quaternion;
     //}
-
-
+    
+    
     @ModifyExpressionValue(
-            method = "renderNameTag",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;cameraOrientation()Lorg/joml/Quaternionf;",
-                    ordinal = 0
-            )
+        method = "renderNameTag",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;cameraOrientation()Lorg/joml/Quaternionf;",
+            ordinal = 0
+        )
     )
     private Quaternionf modifyExpressionValue_renderLabelIfPresent_getRotation_0(Quaternionf originalRotation, Entity entity) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return originalRotation;
         }
         Quaternionf quaternion = new Quaternionf(RotationUtil.getCameraRotationQuaternion(gravityDirection));

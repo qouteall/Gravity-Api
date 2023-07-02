@@ -6,6 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 
 public abstract class GravityPacket {
     public abstract void write(FriendlyByteBuf buf);
+    
     public abstract void run(GravityComponent gc);
+    
     public abstract RotationParameters getRotationParameters();
 }

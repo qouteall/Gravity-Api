@@ -15,18 +15,28 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerPlayNetworkHandlerMixin {
     private static double gravitychanger$onPlayerMove_playerMovementY;
-
-    @Shadow public ServerPlayer player;
-
-    @Shadow private static double clampHorizontal(double d) { return 0; };
-
-    @Shadow private static double clampVertical(double d) { return 0; };
-
-    @Shadow private double lastGoodX;
-
-    @Shadow private double lastGoodY;
-
-    @Shadow private double lastGoodZ;
+    
+    @Shadow
+    public ServerPlayer player;
+    
+    @Shadow
+    private static double clampHorizontal(double d) {return 0;}
+    
+    ;
+    
+    @Shadow
+    private static double clampVertical(double d) {return 0;}
+    
+    ;
+    
+    @Shadow
+    private double lastGoodX;
+    
+    @Shadow
+    private double lastGoodY;
+    
+    @Shadow
+    private double lastGoodZ;
 
 //    @Redirect(
 //            method = "onPlayerMove",
@@ -123,21 +133,21 @@ public abstract class ServerPlayNetworkHandlerMixin {
 //    }
     
     @ModifyArg(
-            method = "handleMovePlayer",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
-            )
+        method = "handleMovePlayer",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
+        )
     )
     private Vec3 modify_onPlayerMove_move_1(Vec3 vec3d) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
-
+        
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
-
+    
     //@Redirect(
     //        method = "onVehicleMove",
     //        at = @At(
@@ -171,24 +181,24 @@ public abstract class ServerPlayNetworkHandlerMixin {
 //
     //    return RotationUtil.vecWorldToPlayer(instance.getPos(), gravityDirection).y;
     //}
-
+    
     @ModifyArg(
-            method = "handleMoveVehicle",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
-            ),
-            index = 1
+        method = "handleMoveVehicle",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
+        ),
+        index = 1
     )
     private Vec3 modify_onVehicleMove_move_0(Vec3 vec3d) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
-
+        
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
-
+    
     //@ModifyVariable(
     //        method = "onVehicleMove",
     //        at = @At(
@@ -205,24 +215,24 @@ public abstract class ServerPlayNetworkHandlerMixin {
 //
     //    return gravitychanger$onPlayerMove_playerMovementY;
     //}
-
-
+    
+    
     @ModifyArgs(
-            method = "noBlocksAround",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;"
-            )
+        method = "noBlocksAround",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/phys/AABB;expandTowards(DDD)Lnet/minecraft/world/phys/AABB;"
+        )
     )
     private void modify_onVehicleMove_move_0(Args args) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        Vec3 argVec = new Vec3(args.get(0),args.get(1),args.get(2));
+        Vec3 argVec = new Vec3(args.get(0), args.get(1), args.get(2));
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
-
-        args.set(0,argVec.x);
-        args.set(1,argVec.y);
-        args.set(2,argVec.z);
-
+        
+        args.set(0, argVec.x);
+        args.set(1, argVec.y);
+        args.set(2, argVec.z);
+        
     }
-
+    
 }
