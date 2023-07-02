@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "gravity_api_q_fork",
+  "id": "gravity_changer_q_fork",
   "version": "${version}",
 
-  "name": "Gravity API",
-  "description": "Lets you change player gravity",
+  "name": "Gravity Changer (qouteall fork)",
+  "description": "Lets you change gravity",
   "contact": {
     "issues": "https://github.com/qouteall/Gravity-Api/issues",
     "sources": "https://github.com/qouteall/Gravity-Api"
@@ -15,7 +15,7 @@
     "qouteall"
   ],
   "license": "MIT",
-  "icon": "assets/gravity_api/icon.png",
+  "icon": "assets/gravity_changer/icon.png",
   
   "environment": "*",
   "entrypoints": {
@@ -23,20 +23,20 @@
       "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ],
     "main": [
-      "com.fusionflux.gravity_api.GravityChangerMod"
+      "gravity_changer.GravityChangerMod"
     ],
     "client": [
-      "com.fusionflux.gravity_api.ClientInit"
+      "gravity_changer.ClientInit"
     ],
     "modmenu": [
-      "com.fusionflux.gravity_api.ModMenuIntegration"
+      "gravity_changer.ModMenuIntegration"
     ],
     "cardinal-components": [
-      "com.fusionflux.gravity_api.util.GravityChangerComponents"
+      "gravity_changer.GravityChangerComponentsInitializer"
     ]
   },
   "mixins": [
-    "gravity_api.mixins.json"
+    "gravity_changer.mixins.json"
   ],
 
   "depends": {
