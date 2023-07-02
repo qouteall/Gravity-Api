@@ -2,20 +2,20 @@ package gravity_changer.mixin;
 
 
 import gravity_changer.api.GravityChangerAPI;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(LookAtEntityGoal.class)
+@Mixin(LookAtPlayerGoal.class)
 public abstract class LookAtEntityGoalMixin {
     @Redirect(
-            method = "tick",
+            method = "Lnet/minecraft/world/entity/ai/goal/LookAtPlayerGoal;tick()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getEyeY()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getEyeY()D",
                     ordinal = 0
             )
     )
@@ -25,14 +25,14 @@ public abstract class LookAtEntityGoalMixin {
             return entity.getEyeY();
         }
 
-        return entity.getEyePos().y;
+        return entity.getEyePosition().y;
     }
 
     @Redirect(
-            method = "tick",
+            method = "Lnet/minecraft/world/entity/ai/goal/LookAtPlayerGoal;tick()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
@@ -42,14 +42,14 @@ public abstract class LookAtEntityGoalMixin {
             return entity.getX();
         }
 
-        return entity.getEyePos().x;
+        return entity.getEyePosition().x;
     }
 
     @Redirect(
-            method = "tick",
+            method = "Lnet/minecraft/world/entity/ai/goal/LookAtPlayerGoal;tick()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
@@ -59,6 +59,6 @@ public abstract class LookAtEntityGoalMixin {
             return entity.getZ();
         }
 
-        return entity.getEyePos().z;
+        return entity.getEyePosition().z;
     }
 }

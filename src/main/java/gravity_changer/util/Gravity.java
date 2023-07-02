@@ -1,7 +1,7 @@
 package gravity_changer.util;
 
 import gravity_changer.api.RotationParameters;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public class Gravity {
     private final Direction direction;

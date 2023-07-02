@@ -1,14 +1,13 @@
 package gravity_changer.mixin;
 
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.ThrowablePotionItem;
 import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.item.PotionItem;
-import net.minecraft.item.ThrowablePotionItem;
 
 @Mixin(value = ThrowablePotionItem.class, priority = 1001)
 public abstract class ThrowablePotionItemMixin extends PotionItem {
 
-    public ThrowablePotionItemMixin(Settings settings) {
+    public ThrowablePotionItemMixin(Properties settings) {
         super(settings);
     }
 

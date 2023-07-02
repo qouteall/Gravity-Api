@@ -3,8 +3,8 @@ package gravity_changer.util.packet;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.util.GravityComponent;
 import gravity_changer.util.NetworkUtil;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class DefaultGravityPacket extends GravityPacket {
     public final Direction direction;
@@ -17,12 +17,12 @@ public class DefaultGravityPacket extends GravityPacket {
         initialGravity = _initialGravity;
     }
 
-    public DefaultGravityPacket(PacketByteBuf buf){
+    public DefaultGravityPacket(FriendlyByteBuf buf){
         this(NetworkUtil.readDirection(buf), NetworkUtil.readRotationParameters(buf), buf.readBoolean());
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         NetworkUtil.writeDirection(buf, direction);
         NetworkUtil.writeRotationParameters(buf, rotationParameters);
         buf.writeBoolean(initialGravity);

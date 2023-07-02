@@ -3,12 +3,12 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-import net.minecraft.block.EntityShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,17 +17,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityShapeContext.class)
+@Mixin(EntityCollisionContext.class)
 public abstract class EntityShapeContextMixin {
     @Shadow @Final private Entity entity;
 
-    @Shadow @Final private double minY;
+    @Shadow @Final private double entityBottom;
 
     @Redirect(
-            method = "<init>(Lnet/minecraft/entity/Entity;)V",
+            method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getY()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getY()D",
                     ordinal = 0
             )
     )
@@ -41,7 +41,7 @@ public abstract class EntityShapeContextMixin {
     }
 
     @Inject(
-            method = "isAbove",
+            method = "Lnet/minecraft/world/phys/shapes/EntityCollisionContext;isAbove(Lnet/minecraft/world/phys/shapes/VoxelShape;Lnet/minecraft/core/BlockPos;Z)Z",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -51,6 +51,6 @@ public abstract class EntityShapeContextMixin {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
         if(gravityDirection == Direction.DOWN) return;
 
-        cir.setReturnValue(this.minY > RotationUtil.boxWorldToPlayer(new Box(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.getBoundingBox().expand(-9.999999747378752E-6D), gravityDirection).maxX);
+        cir.setReturnValue(this.entityBottom > RotationUtil.boxWorldToPlayer(new AABB(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.bounds().inflate(-9.999999747378752E-6D), gravityDirection).maxX);
     }
 }

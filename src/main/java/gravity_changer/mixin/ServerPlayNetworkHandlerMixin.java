@@ -3,30 +3,30 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-@Mixin(ServerPlayNetworkHandler.class)
+@Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerPlayNetworkHandlerMixin {
     private static double gravitychanger$onPlayerMove_playerMovementY;
 
-    @Shadow public ServerPlayerEntity player;
+    @Shadow public ServerPlayer player;
 
     @Shadow private static double clampHorizontal(double d) { return 0; };
 
     @Shadow private static double clampVertical(double d) { return 0; };
 
-    @Shadow private double updatedX;
+    @Shadow private double lastGoodX;
 
-    @Shadow private double updatedY;
+    @Shadow private double lastGoodY;
 
-    @Shadow private double updatedZ;
+    @Shadow private double lastGoodZ;
 
 //    @Redirect(
 //            method = "onPlayerMove",
@@ -129,7 +129,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/server/network/ServerPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"
             )
     )
-    private Vec3d modify_onPlayerMove_move_1(Vec3d vec3d) {
+    private Vec3 modify_onPlayerMove_move_1(Vec3 vec3d) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
@@ -180,7 +180,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 1
     )
-    private Vec3d modify_onVehicleMove_move_0(Vec3d vec3d) {
+    private Vec3 modify_onVehicleMove_move_0(Vec3 vec3d) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;
@@ -216,7 +216,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
     )
     private void modify_onVehicleMove_move_0(Args args) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        Vec3d argVec = new Vec3d(args.get(0),args.get(1),args.get(2));
+        Vec3 argVec = new Vec3(args.get(0),args.get(1),args.get(2));
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
 
         args.set(0,argVec.x);

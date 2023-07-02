@@ -1,14 +1,14 @@
 package gravity_changer.util;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 
 public class GravityDimensionStrengthComponent implements GravityDimensionStrengthInterface {
     double gravityStrength = 1;
 
-    private final World currentWorld;
+    private final Level currentWorld;
 
-    public GravityDimensionStrengthComponent(World world) {
+    public GravityDimensionStrengthComponent(Level world) {
         this.currentWorld = world;
     }
 
@@ -19,19 +19,19 @@ public class GravityDimensionStrengthComponent implements GravityDimensionStreng
 
     @Override
     public void setDimensionGravityStrength(double strength) {
-        if(!currentWorld.isClient) {
+        if(!currentWorld.isClientSide) {
             gravityStrength = strength;
             GravityDimensionStrengthWorldRegister.GRAVITY_DIMENSION_STRENGTH_MODIFIER.sync(currentWorld);
         }
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag) {
+    public void readFromNbt(CompoundTag tag) {
         gravityStrength = tag.getDouble("DimensionGravityStrength");
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag) {
+    public void writeToNbt(CompoundTag tag) {
         tag.putDouble("DimensionGravityStrength" , gravityStrength);
     }
 }

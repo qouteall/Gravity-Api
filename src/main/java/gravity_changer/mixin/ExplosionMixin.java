@@ -3,6 +3,10 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.phys.Vec3;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
@@ -10,18 +14,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.explosion.Explosion;
-
 @Mixin(value = Explosion.class, priority = 1001)
 public abstract class ExplosionMixin {
     @Redirect(
-            method = "collectBlocksAndDamageEntities",
+            method = "Lnet/minecraft/world/level/Explosion;explode()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getEyeY()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getEyeY()D",
                     ordinal = 0
             )
     )
@@ -31,14 +30,14 @@ public abstract class ExplosionMixin {
             return entity.getEyeY();
         }
 
-        return entity.getEyePos().y;
+        return entity.getEyePosition().y;
     }
 
     @Redirect(
-            method = "collectBlocksAndDamageEntities",
+            method = "Lnet/minecraft/world/level/Explosion;explode()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
@@ -48,14 +47,14 @@ public abstract class ExplosionMixin {
             return entity.getX();
         }
 
-        return entity.getEyePos().x;
+        return entity.getEyePosition().x;
     }
 
     @Redirect(
-            method = "collectBlocksAndDamageEntities",
+            method = "Lnet/minecraft/world/level/Explosion;explode()V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
@@ -65,7 +64,7 @@ public abstract class ExplosionMixin {
             return entity.getZ();
         }
 
-        return entity.getEyePos().z;
+        return entity.getEyePosition().z;
     }
 
     @WrapOperation(
@@ -76,7 +75,7 @@ public abstract class ExplosionMixin {
                     ordinal = 0
             )
     )
-    private Vec3d wrapOperation_collectBlocksAndDamageEntities_getVelocity_0(Entity entity, Operation<Vec3d> original) {
+    private Vec3 wrapOperation_collectBlocksAndDamageEntities_getVelocity_0(Entity entity, Operation<Vec3> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             return original.call(entity);
@@ -93,7 +92,7 @@ public abstract class ExplosionMixin {
                     ordinal = 0
             )
     )
-    private void wrapOperation_collectBlocksAndDamageEntities_setVelocity_0(Entity entity, Vec3d vec3d, Operation<Void> original) {
+    private void wrapOperation_collectBlocksAndDamageEntities_setVelocity_0(Entity entity, Vec3 vec3d, Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if(gravityDirection == Direction.DOWN) {
             original.call(entity, vec3d);

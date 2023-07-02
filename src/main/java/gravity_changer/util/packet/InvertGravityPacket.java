@@ -3,7 +3,7 @@ package gravity_changer.util.packet;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.util.GravityComponent;
 import gravity_changer.util.NetworkUtil;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class InvertGravityPacket extends GravityPacket{
     public final boolean inverted;
@@ -16,7 +16,7 @@ public class InvertGravityPacket extends GravityPacket{
         initialGravity = _initialGravity;
     }
 
-    public InvertGravityPacket(PacketByteBuf buf) {
+    public InvertGravityPacket(FriendlyByteBuf buf) {
         this(
             buf.readBoolean(),
             NetworkUtil.readRotationParameters(buf),
@@ -25,7 +25,7 @@ public class InvertGravityPacket extends GravityPacket{
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         buf.writeBoolean(inverted);
         NetworkUtil.writeRotationParameters(buf, rotationParameters);
         buf.writeBoolean(initialGravity);

@@ -4,18 +4,22 @@ import gravity_changer.RotationAnimation;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.config.GravityChangerConfig;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.core.Direction;
 import net.minecraft.entity.projectile.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -45,36 +49,36 @@ public class GravityDirectionComponent implements GravityComponent {
     
     public void onGravityChanged(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters, boolean initialGravity) {
         entity.fallDistance = 0;
-        entity.setPosition(entity.getPos());//Causes bounding box recalculation
+        entity.setPos(entity.position());//Causes bounding box recalculation
         
         if (!initialGravity) {
-            if(!(entity instanceof ServerPlayerEntity)) {
+            if(!(entity instanceof ServerPlayer)) {
                 //A relativeRotationCentre of zero will result in zero translation
-                Vec3d relativeRotationCentre = getCentreOfRotation(oldGravity, newGravity, rotationParameters);
-                Vec3d translation = RotationUtil.vecPlayerToWorld(relativeRotationCentre, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCentre, newGravity));
+                Vec3 relativeRotationCentre = getCentreOfRotation(oldGravity, newGravity, rotationParameters);
+                Vec3 translation = RotationUtil.vecPlayerToWorld(relativeRotationCentre, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCentre, newGravity));
                 Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravity, oldGravity);
-                Vec3d smidge = new Vec3d(
+                Vec3 smidge = new Vec3(
                         relativeDirection == Direction.EAST ? -1.0E-6D : 0.0D,
                         relativeDirection == Direction.UP ? -1.0E-6D : 0.0D,
                         relativeDirection == Direction.SOUTH ? -1.0E-6D : 0.0D
                 );
                 smidge = RotationUtil.vecPlayerToWorld(smidge, oldGravity);
-                entity.setPosition(entity.getPos().add(translation).add(smidge));
+                entity.setPos(entity.position().add(translation).add(smidge));
                 if(shouldChangeVelocity() && !rotationParameters.alternateCenter()) {
                     //Adjust entity position to avoid suffocation and collision
                     adjustEntityPosition(oldGravity, newGravity);
                 }
             }
             if(shouldChangeVelocity()) {
-                Vec3d realWorldVelocity = getRealWorldVelocity(entity, prevGravityDirection);
+                Vec3 realWorldVelocity = getRealWorldVelocity(entity, prevGravityDirection);
                 if (rotationParameters.rotateVelocity()) {
                     //Rotate velocity with gravity, this will cause things to appear to take a sharp turn
                     Vector3f worldSpaceVec = realWorldVelocity.toVector3f();
                     worldSpaceVec.rotate(RotationUtil.getRotationBetween(prevGravityDirection, gravityDirection));
-                    entity.setVelocity(RotationUtil.vecWorldToPlayer(new Vec3d(worldSpaceVec), gravityDirection));
+                    entity.setDeltaMovement(RotationUtil.vecWorldToPlayer(new Vec3(worldSpaceVec), gravityDirection));
                 } else {
                     //Velocity will be conserved relative to the world, will result in more natural motion
-                    entity.setVelocity(RotationUtil.vecWorldToPlayer(realWorldVelocity, gravityDirection));
+                    entity.setDeltaMovement(RotationUtil.vecWorldToPlayer(realWorldVelocity, gravityDirection));
                 }
             }
         }
@@ -83,38 +87,38 @@ public class GravityDirectionComponent implements GravityComponent {
     // getVelocity() does not return the actual velocity. It returns the velocity plus acceleration.
     // Even if the entity is standing still, getVelocity() will still give a downwards vector.
     // The real velocity is this tick position subtract last tick position
-    private Vec3d getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
-        if (entity.isLogicalSideForUpdatingMovement()) {
-            return new Vec3d(
-                entity.getX() - entity.prevX,
-                entity.getY() - entity.prevY,
-                entity.getZ() - entity.prevZ
+    private Vec3 getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
+        if (entity.isControlledByLocalInstance()) {
+            return new Vec3(
+                entity.getX() - entity.xo,
+                entity.getY() - entity.yo,
+                entity.getZ() - entity.zo
             );
         }
         
-        return RotationUtil.vecPlayerToWorld(entity.getVelocity(), prevGravityDirection);
+        return RotationUtil.vecPlayerToWorld(entity.getDeltaMovement(), prevGravityDirection);
     }
     
     private boolean shouldChangeVelocity() {
-        if(entity instanceof FishingBobberEntity) return true;
+        if(entity instanceof FishingHook) return true;
         if(entity instanceof FireworkRocketEntity) return true;
-        return !(entity instanceof ProjectileEntity);
+        return !(entity instanceof Projectile);
     }
 
     @NotNull
-    private Vec3d getCentreOfRotation(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters) {
-        Vec3d relativeRotationCentre = Vec3d.ZERO;
-        if(entity instanceof EndCrystalEntity){
+    private Vec3 getCentreOfRotation(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters) {
+        Vec3 relativeRotationCentre = Vec3.ZERO;
+        if(entity instanceof EndCrystal){
             //In the middle of the block below
-            relativeRotationCentre = new Vec3d(0, -0.5, 0);
+            relativeRotationCentre = new Vec3(0, -0.5, 0);
         }else if(rotationParameters.alternateCenter()) {
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             if(newGravity.getOpposite() == oldGravity){
                 //In the center of the hit-box
-                relativeRotationCentre = new Vec3d(0, dimensions.height / 2, 0);
+                relativeRotationCentre = new Vec3(0, dimensions.height / 2, 0);
             }else {
                 //Around the ankles
-                relativeRotationCentre = new Vec3d(0, dimensions.width / 2, 0);
+                relativeRotationCentre = new Vec3(0, dimensions.width / 2, 0);
             }
         }
         return relativeRotationCentre;
@@ -122,58 +126,58 @@ public class GravityDirectionComponent implements GravityComponent {
 
     // Adjust position to avoid suffocation in blocks when changing gravity
     private void adjustEntityPosition(Direction oldGravity, Direction newGravity) {
-        if (entity instanceof AreaEffectCloudEntity || entity instanceof PersistentProjectileEntity || entity instanceof EndCrystalEntity) {
+        if (entity instanceof AreaEffectCloud || entity instanceof AbstractArrow || entity instanceof EndCrystal) {
             return;
         }
         
-        Box entityBoundingBox = entity.getBoundingBox();
+        AABB entityBoundingBox = entity.getBoundingBox();
         
         // for example, if gravity changed from down to north, move up
         // if gravity changed from down to up, also move up
         Direction movingDirection = oldGravity.getOpposite();
         
-        Iterable<VoxelShape> collisions = entity.getWorld().getCollisions(entity, entityBoundingBox);
-        Box totalCollisionBox = null;
+        Iterable<VoxelShape> collisions = entity.level().getCollisions(entity, entityBoundingBox);
+        AABB totalCollisionBox = null;
         for (VoxelShape collision : collisions) {
             if (!collision.isEmpty()) {
-                Box boundingBox = collision.getBoundingBox();
+                AABB boundingBox = collision.bounds();
                 if (totalCollisionBox == null) {
                     totalCollisionBox = boundingBox;
                 }
                 else {
-                    totalCollisionBox = totalCollisionBox.union(boundingBox);
+                    totalCollisionBox = totalCollisionBox.minmax(boundingBox);
                 }
             }
         }
         
         if (totalCollisionBox != null) {
-            entity.setPosition(entity.getPos().add(getPositionAdjustmentOffset(
+            entity.setPos(entity.position().add(getPositionAdjustmentOffset(
                 entityBoundingBox, totalCollisionBox, movingDirection
             )));
         }
     }
     
-    private static Vec3d getPositionAdjustmentOffset(
-        Box entityBoundingBox, Box nearbyCollisionUnion, Direction movingDirection
+    private static Vec3 getPositionAdjustmentOffset(
+        AABB entityBoundingBox, AABB nearbyCollisionUnion, Direction movingDirection
     ) {
         Direction.Axis axis = movingDirection.getAxis();
         double offset = 0;
-        if (movingDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
-            double pushing = nearbyCollisionUnion.getMax(axis);
-            double pushed = entityBoundingBox.getMin(axis);
+        if (movingDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+            double pushing = nearbyCollisionUnion.max(axis);
+            double pushed = entityBoundingBox.min(axis);
             if (pushing > pushed) {
                 offset = pushing - pushed;
             }
         }
         else {
-            double pushing = nearbyCollisionUnion.getMin(axis);
-            double pushed = entityBoundingBox.getMax(axis);
+            double pushing = nearbyCollisionUnion.min(axis);
+            double pushed = entityBoundingBox.max(axis);
             if (pushing < pushed) {
                 offset = pushed - pushing;
             }
         }
         
-        return new Vec3d(movingDirection.getUnitVector()).multiply(offset);
+        return new Vec3(movingDirection.step()).scale(offset);
     }
 
     @Override
@@ -183,7 +187,7 @@ public class GravityDirectionComponent implements GravityComponent {
         if (highestPriority != null) {
             strength = highestPriority.strength();
         }
-        double dimStrength = GravityChangerAPI.getDimensionGravityStrength(entity.getWorld());
+        double dimStrength = GravityChangerAPI.getDimensionGravityStrength(entity.level());
         return defaultGravityStrength * dimStrength * strength;
     }
 
@@ -233,8 +237,8 @@ public class GravityDirectionComponent implements GravityComponent {
             Direction newGravity = getActualGravityDirection();
             Direction oldGravity = gravityDirection;
             if (oldGravity != newGravity) {
-                long timeMs = entity.getWorld().getTime() * 50;
-                if(entity.getWorld().isClient) {
+                long timeMs = entity.level().getGameTime() * 50;
+                if(entity.level().isClientSide) {
                     animation.applyRotationAnimation(
                             newGravity, oldGravity,
                             initialGravity ? 0 : rotationParameters.rotationTime(),
@@ -334,20 +338,20 @@ public class GravityDirectionComponent implements GravityComponent {
     }
     
     @Override
-    public void readFromNbt(NbtCompound nbt) {
+    public void readFromNbt(CompoundTag nbt) {
         //Store old values
         Direction oldDefaultGravity = defaultGravityDirection;
         double oldDefaultStrength = defaultGravityStrength;
         ArrayList<Gravity> oldList = gravityList;
         boolean oldIsInverted = isInverted;
         //Load values from nbt
-        if (nbt.contains("ListSize", NbtElement.INT_TYPE)) {
+        if (nbt.contains("ListSize", Tag.TAG_INT)) {
             int listSize = nbt.getInt("ListSize");
             ArrayList<Gravity> newGravityList = new ArrayList<>();
             if (listSize != 0) {
                 for (int index = 0; index < listSize; index++) {
                     Gravity newGravity = new Gravity(
-                        Direction.byId(nbt.getInt("GravityDirection " + index)),
+                        Direction.from3DDataValue(nbt.getInt("GravityDirection " + index)),
                             nbt.getInt("GravityPriority " + index),
                             nbt.getDouble("GravityStrength " + index),
                         nbt.getInt("GravityDuration " + index),
@@ -358,14 +362,14 @@ public class GravityDirectionComponent implements GravityComponent {
             }
             gravityList = newGravityList;
         }
-        prevGravityDirection = Direction.byId(nbt.getInt("PrevGravityDirection"));
+        prevGravityDirection = Direction.from3DDataValue(nbt.getInt("PrevGravityDirection"));
         if (nbt.contains("DefaultGravityStrength")) {
             defaultGravityStrength = nbt.getDouble("DefaultGravityStrength");
         }
         else {
             defaultGravityStrength = 1.0;
         }
-        defaultGravityDirection = Direction.byId(nbt.getInt("DefaultGravityDirection"));
+        defaultGravityDirection = Direction.from3DDataValue(nbt.getInt("DefaultGravityDirection"));
         isInverted = nbt.getBoolean("IsGravityInverted");
         //Update
         RotationParameters rp = new RotationParameters(false, false, false, 0);
@@ -378,11 +382,11 @@ public class GravityDirectionComponent implements GravityComponent {
     }
     
     @Override
-    public void writeToNbt(@NotNull NbtCompound nbt) {
+    public void writeToNbt(@NotNull CompoundTag nbt) {
         int index = 0;
         for (Gravity temp : getGravity()) {
             if (temp.direction() != null && temp.source() != null) {
-                nbt.putInt("GravityDirection " + index, temp.direction().getId());
+                nbt.putInt("GravityDirection " + index, temp.direction().get3DDataValue());
                 nbt.putInt("GravityPriority " + index, temp.priority());
                 nbt.putDouble("GravityStrength " + index, temp.strength());
                 nbt.putInt("GravityDuration " + index, temp.duration());
@@ -391,9 +395,9 @@ public class GravityDirectionComponent implements GravityComponent {
             }
         }
         nbt.putInt("ListSize", index);
-        nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().getId());
+        nbt.putInt("PrevGravityDirection", this.getPrevGravityDirection().get3DDataValue());
         nbt.putDouble("DefaultGravityStrength", this.getDefaultGravityStrength());
-        nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().getId());
+        nbt.putInt("DefaultGravityDirection", this.getDefaultGravityDirection().get3DDataValue());
         nbt.putBoolean("IsGravityInverted", this.getInvertGravity());
     }
 
@@ -415,7 +419,7 @@ public class GravityDirectionComponent implements GravityComponent {
                 temp.decrementDuration();
             }
         }
-        if(!entity.getWorld().isClient && needsInitialSync){
+        if(!entity.level().isClientSide && needsInitialSync){
             needsInitialSync = false;
             RotationParameters rotationParameters = new RotationParameters(false, false, false, 0);
             GravityChannel.sendFullStatePacket(entity, NetworkUtil.PacketMode.EVERYONE, rotationParameters, true);

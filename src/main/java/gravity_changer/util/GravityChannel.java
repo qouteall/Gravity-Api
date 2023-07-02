@@ -2,20 +2,21 @@ package gravity_changer.util;
 
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.RotationParameters;
+import gravity_changer.util.GravityChannel.Factory;
 import gravity_changer.util.NetworkUtil.PacketMode;
 import gravity_changer.util.packet.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.Entity;
 
 import static gravity_changer.util.NetworkUtil.*;
 
@@ -27,23 +28,23 @@ public class GravityChannel<P extends GravityPacket> {
     public static GravityChannel<InvertGravityPacket> INVERT_GRAVITY = new GravityChannel<>(InvertGravityPacket::new, GravityChangerMod.id("inverted"));
 
     private final Factory<P> packetFactory;
-    private final Identifier channel;
+    private final ResourceLocation channel;
     private final GravityVerifierRegistry<P> gravityVerifierRegistry;
 
-    GravityChannel(Factory<P> _packetFactory, Identifier _channel){
+    GravityChannel(Factory<P> _packetFactory, ResourceLocation _channel){
         packetFactory = _packetFactory;
         channel = _channel;
         gravityVerifierRegistry = new GravityVerifierRegistry<>();
     }
 
     public void sendToClient(Entity entity, P packet, PacketMode mode){
-        PacketByteBuf buf = PacketByteBufs.create();
+        FriendlyByteBuf buf = PacketByteBufs.create();
         buf.writeInt(entity.getId());
         packet.write(buf);
         sendToTracking(entity, channel, buf, mode);
     }
 
-    public void receiveFromServer(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
+    public void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender){
         int entityId = buf.readInt();
         P packet = packetFactory.read(buf);
         client.execute(() -> {
@@ -51,18 +52,18 @@ public class GravityChannel<P extends GravityPacket> {
         });
     }
 
-    public void sendToServer(P packet, Identifier verifier, PacketByteBuf verifierInfoBuf){
-        PacketByteBuf buf = PacketByteBufs.create();
+    public void sendToServer(P packet, ResourceLocation verifier, FriendlyByteBuf verifierInfoBuf){
+        FriendlyByteBuf buf = PacketByteBufs.create();
         packet.write(buf);
-        buf.writeIdentifier(verifier);
+        buf.writeResourceLocation(verifier);
         buf.writeByteArray(verifierInfoBuf.array());
         ClientPlayNetworking.send(channel, buf);
     }
 
-    public void receiveFromClient(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender){
+    public void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
         P packet = packetFactory.read(buf);
-        Identifier verifier = buf.readIdentifier();
-        PacketByteBuf verifierInfoBuf = PacketByteBufs.create();
+        ResourceLocation verifier = buf.readResourceLocation();
+        FriendlyByteBuf verifierInfoBuf = PacketByteBufs.create();
         verifierInfoBuf.writeBytes(buf.readByteArray());
         server.execute(() -> {
             getGravityComponent(player).ifPresent(gc -> {
@@ -117,6 +118,6 @@ public class GravityChannel<P extends GravityPacket> {
 
     @FunctionalInterface
     interface Factory<T extends GravityPacket> {
-        T read(PacketByteBuf buf);
+        T read(FriendlyByteBuf buf);
     }
 }

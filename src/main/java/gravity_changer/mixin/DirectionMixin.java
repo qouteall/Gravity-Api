@@ -3,14 +3,13 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Direction;
 
 @Mixin(value = Direction.class, priority = 1001)
 public abstract class DirectionMixin {
@@ -28,7 +27,7 @@ public abstract class DirectionMixin {
             return original.call(entity, tickDelta);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -45,7 +44,7 @@ public abstract class DirectionMixin {
             return original.call(entity, tickDelta);
         }
 
-        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
+        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
     }
 
     @WrapOperation(
@@ -62,7 +61,7 @@ public abstract class DirectionMixin {
             return original.call(entity, tickDelta);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -79,7 +78,7 @@ public abstract class DirectionMixin {
             return original.call(entity, tickDelta);
         }
 
-        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getPitch(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -96,6 +95,6 @@ public abstract class DirectionMixin {
             return original.call(entity, tickDelta);
         }
 
-        return RotationUtil.rotPlayerToWorld(entity.getYaw(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
+        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
     }
 }

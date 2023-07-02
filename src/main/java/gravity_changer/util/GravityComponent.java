@@ -4,9 +4,8 @@ import gravity_changer.RotationAnimation;
 import gravity_changer.api.RotationParameters;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
-import net.minecraft.util.math.Direction;
-
 import java.util.ArrayList;
+import net.minecraft.core.Direction;
 
 public interface GravityComponent extends Component, CommonTickingComponent {
     //Internal

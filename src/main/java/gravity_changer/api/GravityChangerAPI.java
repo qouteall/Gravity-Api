@@ -14,25 +14,24 @@ import gravity_changer.util.RotationUtil;
 import gravity_changer.util.packet.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.world.World;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
-
+import var;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
 public abstract class GravityChangerAPI {
     public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
-            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_direction"), GravityComponent.class);
+            ComponentRegistry.getOrCreate(new ResourceLocation("gravityapi", "gravity_direction"), GravityComponent.class);
 
 //    public static final ComponentKey<GravityDimensionStrengthInterface> GRAVITY_DIMENSION_STRENGTH_COMPONENT =
 //            ComponentRegistry.getOrCreate(new Identifier("gravityapi", "gravity_dimension_strength"), GravityDimensionStrengthInterface.class);
@@ -103,7 +102,7 @@ public abstract class GravityChangerAPI {
         return 1d;
     }
 
-    public static double getDimensionGravityStrength(World world) {
+    public static double getDimensionGravityStrength(Level world) {
         return 1;
 //        return maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).map(GravityDimensionStrengthInterface::getDimensionGravityStrength).orElse(1d);
     }
@@ -147,7 +146,7 @@ public abstract class GravityChangerAPI {
     }
 
     @Environment(EnvType.CLIENT)
-    public static void addGravityClient(ClientPlayerEntity entity, Gravity gravity, Identifier verifier, PacketByteBuf verifierInfo) {
+    public static void addGravityClient(LocalPlayer entity, Gravity gravity, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
@@ -183,7 +182,7 @@ public abstract class GravityChangerAPI {
         }
     }
     @Environment(EnvType.CLIENT)
-    public static void setGravityClient(ClientPlayerEntity entity, ArrayList<Gravity> gravity, Identifier verifier, PacketByteBuf verifierInfo) {
+    public static void setGravityClient(LocalPlayer entity, ArrayList<Gravity> gravity, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
@@ -220,13 +219,13 @@ public abstract class GravityChangerAPI {
         }
     }
 
-    public static void setDimensionGravityStrength(World world, double strength) {
+    public static void setDimensionGravityStrength(Level world, double strength) {
         throw new NotImplementedException();
 //        maybeGetSafe(GRAVITY_DIMENSION_STRENGTH_COMPONENT, world).ifPresent(component -> component.setDimensionGravityStrength(strength));
     }
 
     @Environment(EnvType.CLIENT)
-    public static void setIsInvertedClient(ClientPlayerEntity entity, boolean isInverted, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
+    public static void setIsInvertedClient(LocalPlayer entity, boolean isInverted, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
@@ -252,7 +251,7 @@ public abstract class GravityChangerAPI {
         }
     }
     @Environment(EnvType.CLIENT)
-    public static void clearGravityClient(ClientPlayerEntity entity, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
+    public static void clearGravityClient(LocalPlayer entity, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
@@ -283,7 +282,7 @@ public abstract class GravityChangerAPI {
         }
     }
     @Environment(EnvType.CLIENT)
-    public static void setDefaultGravityDirectionClient(ClientPlayerEntity entity, Direction gravityDirection, RotationParameters rotationParameters, Identifier verifier, PacketByteBuf verifierInfo) {
+    public static void setDefaultGravityDirectionClient(LocalPlayer entity, Direction gravityDirection, RotationParameters rotationParameters, ResourceLocation verifier, FriendlyByteBuf verifierInfo) {
         if(onCorrectSide(entity, false)) {
             if (EntityTags.canChangeGravity(entity)) {
                 maybeGetSafe(GRAVITY_COMPONENT, entity).ifPresent(gc -> {
@@ -306,31 +305,31 @@ public abstract class GravityChangerAPI {
      * Returns the world relative velocity for the given player
      * Using minecraft's methods to get the velocity of a the player will return player relative velocity
      */
-    public static Vec3d getWorldVelocity(Entity playerEntity) {
-        return RotationUtil.vecPlayerToWorld(playerEntity.getVelocity(), getGravityDirection(playerEntity));
+    public static Vec3 getWorldVelocity(Entity playerEntity) {
+        return RotationUtil.vecPlayerToWorld(playerEntity.getDeltaMovement(), getGravityDirection(playerEntity));
     }
 
     /**
      * Sets the world relative velocity for the given player
      * Using minecraft's methods to set the velocity of an entity will set player relative velocity
      */
-    public static void setWorldVelocity(Entity entity, Vec3d worldVelocity) {
-        entity.setVelocity(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
+    public static void setWorldVelocity(Entity entity, Vec3 worldVelocity) {
+        entity.setDeltaMovement(RotationUtil.vecWorldToPlayer(worldVelocity, getGravityDirection(entity)));
     }
 
     /**
      * Returns eye position offset from feet position for the given entity
      */
-    public static Vec3d getEyeOffset(Entity entity) {
-        return RotationUtil.vecPlayerToWorld(0, (double) entity.getStandingEyeHeight(), 0, getGravityDirection(entity));
+    public static Vec3 getEyeOffset(Entity entity) {
+        return RotationUtil.vecPlayerToWorld(0, (double) entity.getEyeHeight(), 0, getGravityDirection(entity));
     }
 
     private static boolean onCorrectSide(Entity entity, boolean shouldBeOnServer){
-        if(entity.getWorld().isClient && shouldBeOnServer) {
+        if(entity.level().isClientSide && shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the server, use dedicated client server. ", new Exception());
             return false;
         }
-        if(!entity.getWorld().isClient && !shouldBeOnServer) {
+        if(!entity.level().isClientSide && !shouldBeOnServer) {
             GravityChangerMod.LOGGER.error("GravityChangerAPI function cannot be called from the client, use dedicated client client. ", new Exception());
             return false;
         }

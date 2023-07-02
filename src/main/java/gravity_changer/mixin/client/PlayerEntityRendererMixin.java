@@ -1,21 +1,20 @@
 package gravity_changer.mixin.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(PlayerEntityRenderer.class)
+@Mixin(PlayerRenderer.class)
 public abstract class PlayerEntityRendererMixin {
     @ModifyVariable(
-            method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V",
+            method = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V",
             at = @At(
                     value = "INVOKE_ASSIGN",
                     target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;",
@@ -23,7 +22,7 @@ public abstract class PlayerEntityRendererMixin {
             ),
             ordinal = 0
     )
-    private Vec3d modify_setupTransforms_Vec3d_0(Vec3d vec3d, AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h) {
+    private Vec3 modify_setupTransforms_Vec3d_0(Vec3 vec3d, AbstractClientPlayer abstractClientPlayerEntity, PoseStack matrixStack, float f, float g, float h) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(abstractClientPlayerEntity);
         if(gravityDirection == Direction.DOWN) {
             return vec3d;

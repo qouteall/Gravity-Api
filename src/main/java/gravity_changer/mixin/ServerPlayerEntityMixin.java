@@ -3,19 +3,19 @@ package gravity_changer.mixin;
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(ServerPlayer.class)
 public abstract class ServerPlayerEntityMixin {
 
     @Inject(
-            method = "moveToWorld",
+            method = "Lnet/minecraft/server/level/ServerPlayer;changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V",
@@ -23,17 +23,17 @@ public abstract class ServerPlayerEntityMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void inject_moveToWorld_sendPacket_1(CallbackInfoReturnable<ServerPlayerEntity> cir) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
-        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
+    private void inject_moveToWorld_sendPacket_1(CallbackInfoReturnable<ServerPlayer> cir) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayer)(Object)this);
+        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayer)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
         } else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayer)(Object)this), new RotationParameters().rotationTime(0));
         }
     }
 
     @Inject(
-            method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V",
+            method = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V",
@@ -42,22 +42,22 @@ public abstract class ServerPlayerEntityMixin {
             )
     )
     private void inject_teleport_sendPacket_0(CallbackInfo ci) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayerEntity)(Object)this);
-        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayer)(Object)this);
+        if(gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayer)(Object)this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, Direction.DOWN, new RotationParameters().rotationTime(0));
         } else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayerEntity)(Object)this), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayer)(Object)this), new RotationParameters().rotationTime(0));
         }
     }
 
     @Inject(
-            method = "copyFrom",
+            method = "Lnet/minecraft/server/level/ServerPlayer;restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V",
             at = @At("TAIL")
     )
-    private void inject_copyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+    private void inject_copyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
         if(GravityChangerMod.config.resetGravityOnRespawn) {
         } else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayerEntity)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer)(Object)this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
         }
     }
 }

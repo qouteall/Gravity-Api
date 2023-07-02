@@ -3,20 +3,20 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.DrownedEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Drowned;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(DrownedEntity.class)
+@Mixin(Drowned.class)
 public abstract class DrownedEntityMixin {
     @Redirect(
-            method = "attack",
+            method = "Lnet/minecraft/world/entity/monster/Drowned;performRangedAttack(Lnet/minecraft/world/entity/LivingEntity;F)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getX()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getX()D",
                     ordinal = 0
             )
     )
@@ -26,31 +26,31 @@ public abstract class DrownedEntityMixin {
             return target.getX();
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).x;
+        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).x;
     }
 
     @Redirect(
-            method = "attack",
+            method = "Lnet/minecraft/world/entity/monster/Drowned;performRangedAttack(Lnet/minecraft/world/entity/LivingEntity;F)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getBodyY(D)D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getY(D)D",
                     ordinal = 0
             )
     )
     private double redirect_attack_getBodyY_0(LivingEntity target, double heightScale) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
-            return target.getBodyY(heightScale);
+            return target.getY(heightScale);
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).y;
+        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).y;
     }
 
     @Redirect(
-            method = "attack",
+            method = "Lnet/minecraft/world/entity/monster/Drowned;performRangedAttack(Lnet/minecraft/world/entity/LivingEntity;F)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getZ()D",
                     ordinal = 0
             )
     )
@@ -60,11 +60,11 @@ public abstract class DrownedEntityMixin {
             return target.getZ();
         }
 
-        return target.getPos().add(RotationUtil.vecPlayerToWorld(0.0D, target.getHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).z;
+        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).z;
     }
 
     @Redirect(
-            method = "attack",
+            method = "Lnet/minecraft/world/entity/monster/Drowned;performRangedAttack(Lnet/minecraft/world/entity/LivingEntity;F)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/lang/Math;sqrt(D)D"

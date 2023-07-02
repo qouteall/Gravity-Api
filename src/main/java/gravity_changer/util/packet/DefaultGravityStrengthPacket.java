@@ -2,7 +2,7 @@ package gravity_changer.util.packet;
 
 import gravity_changer.api.RotationParameters;
 import gravity_changer.util.GravityComponent;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class DefaultGravityStrengthPacket extends GravityPacket {
     public final double strength;
@@ -11,12 +11,12 @@ public class DefaultGravityStrengthPacket extends GravityPacket {
         strength = _strength;
     }
 
-    public DefaultGravityStrengthPacket(PacketByteBuf buf){
+    public DefaultGravityStrengthPacket(FriendlyByteBuf buf){
         this(buf.readDouble());
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         buf.writeDouble(strength);
     }
 

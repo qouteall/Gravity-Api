@@ -1,13 +1,13 @@
 package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ThrownPotion;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.thrown.PotionEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(PotionEntity.class)
+@Mixin(ThrownPotion.class)
 public class PotionEntityMixin {
     @ModifyReturnValue(method = "getGravity", at = @At("RETURN"))
     private float multiplyGravity(float original) {

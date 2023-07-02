@@ -2,14 +2,17 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.entity.*;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.potion.Potion;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import java.util.List;
 import java.util.Map;
 
-@Mixin(AreaEffectCloudEntity.class)
+@Mixin(AreaEffectCloud.class)
 public abstract class AreaEffectCloudEntityMixin extends Entity{
 
 
@@ -29,7 +32,7 @@ public abstract class AreaEffectCloudEntityMixin extends Entity{
 
     @Shadow public abstract float getRadius();
 
-    @Shadow public abstract ParticleEffect getParticleType();
+    @Shadow public abstract ParticleOptions getParticle();
 
     @Shadow public abstract int getColor();
 
@@ -38,13 +41,13 @@ public abstract class AreaEffectCloudEntityMixin extends Entity{
 
     @Shadow protected abstract void setWaiting(boolean waiting);
 
-    @Shadow private float radiusGrowth;
+    @Shadow private float radiusPerTick;
 
     @Shadow public abstract void setRadius(float radius);
 
-    @Shadow @Final private Map<Entity, Integer> affectedEntities;
+    @Shadow @Final private Map<Entity, Integer> victims;
     @Shadow private Potion potion;
-    @Shadow @Final private List<StatusEffectInstance> effects;
+    @Shadow @Final private List<MobEffectInstance> effects;
     @Shadow private int reapplicationDelay;
 
     @Shadow @Nullable public abstract LivingEntity getOwner();
@@ -57,7 +60,7 @@ public abstract class AreaEffectCloudEntityMixin extends Entity{
 
    //private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
 
-    public AreaEffectCloudEntityMixin(EntityType<?> type, World world) {
+    public AreaEffectCloudEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
@@ -188,15 +191,15 @@ public abstract class AreaEffectCloudEntityMixin extends Entity{
         }
 
         float h = this.random.nextFloat() * 6.2831855F;
-        float k = MathHelper.sqrt(this.random.nextFloat()) * g;
+        float k = Mth.sqrt(this.random.nextFloat()) * g;
 
         double d = this.getX() ;
         double e = this.getY();
         double l = this.getZ() ;
-        Vec3d modify = RotationUtil.vecWorldToPlayer(d,e,l, GravityChangerAPI.getGravityDirection(this));
-        d = modify.x+ (double)(MathHelper.cos(h) * k);
+        Vec3 modify = RotationUtil.vecWorldToPlayer(d,e,l, GravityChangerAPI.getGravityDirection(this));
+        d = modify.x+ (double)(Mth.cos(h) * k);
         e = modify.y;
-        l = modify.z+ (double)(MathHelper.sin(h) * k);
+        l = modify.z+ (double)(Mth.sin(h) * k);
         modify = RotationUtil.vecPlayerToWorld(d,e,l, GravityChangerAPI.getGravityDirection(this));
 
         args.set(1,modify.x);

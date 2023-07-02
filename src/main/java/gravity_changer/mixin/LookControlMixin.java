@@ -2,9 +2,9 @@ package gravity_changer.mixin;
 
 
 import gravity_changer.api.GravityChangerAPI;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.control.LookControl;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.control.LookControl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(LookControl.class)
 public abstract class LookControlMixin {
     @Redirect(
-            method = "getLookingHeightFor",
+            method = "Lnet/minecraft/world/entity/ai/control/LookControl;getWantedY(Lnet/minecraft/world/entity/Entity;)D",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getEyeY()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getEyeY()D",
                     ordinal = 0
             )
     )
@@ -25,14 +25,14 @@ public abstract class LookControlMixin {
             return entity.getEyeY();
         }
 
-        return entity.getEyePos().y;
+        return entity.getEyePosition().y;
     }
 
     @Redirect(
-            method = "lookAt(Lnet/minecraft/entity/Entity;)V",
+            method = "Lnet/minecraft/world/entity/ai/control/LookControl;setLookAt(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
@@ -42,14 +42,14 @@ public abstract class LookControlMixin {
             return entity.getX();
         }
 
-        return entity.getEyePos().x;
+        return entity.getEyePosition().x;
     }
 
     @Redirect(
-            method = "lookAt(Lnet/minecraft/entity/Entity;)V",
+            method = "Lnet/minecraft/world/entity/ai/control/LookControl;setLookAt(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
@@ -59,14 +59,14 @@ public abstract class LookControlMixin {
             return entity.getZ();
         }
 
-        return entity.getEyePos().z;
+        return entity.getEyePosition().z;
     }
 
     @Redirect(
-            method = "lookAt(Lnet/minecraft/entity/Entity;FF)V",
+            method = "Lnet/minecraft/world/entity/ai/control/LookControl;setLookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
@@ -76,14 +76,14 @@ public abstract class LookControlMixin {
             return entity.getX();
         }
 
-        return entity.getEyePos().x;
+        return entity.getEyePosition().x;
     }
 
     @Redirect(
-            method = "lookAt(Lnet/minecraft/entity/Entity;FF)V",
+            method = "Lnet/minecraft/world/entity/ai/control/LookControl;setLookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
@@ -93,6 +93,6 @@ public abstract class LookControlMixin {
             return entity.getZ();
         }
 
-        return entity.getEyePos().z;
+        return entity.getEyePosition().z;
     }
 }

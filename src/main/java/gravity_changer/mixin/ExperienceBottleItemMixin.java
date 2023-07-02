@@ -1,14 +1,13 @@
 package gravity_changer.mixin;
 
+import net.minecraft.world.item.ExperienceBottleItem;
+import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.item.ExperienceBottleItem;
-import net.minecraft.item.Item;
 
 @Mixin(ExperienceBottleItem.class)
 public abstract class ExperienceBottleItemMixin extends Item {
 
-    public ExperienceBottleItemMixin(Settings settings) {
+    public ExperienceBottleItemMixin(Properties settings) {
         super(settings);
     }
 

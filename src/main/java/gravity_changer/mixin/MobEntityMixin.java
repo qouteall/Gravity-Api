@@ -3,6 +3,10 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
@@ -10,12 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.Direction;
-
-@Mixin(MobEntity.class)
+@Mixin(Mob.class)
 public abstract class MobEntityMixin {
     @WrapOperation(
             method = "tryAttack",
@@ -25,13 +24,13 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private float wrapOperation_tryAttack_getYaw_0(MobEntity attacker, Operation<Float> original, Entity target) {
+    private float wrapOperation_tryAttack_getYaw_0(Mob attacker, Operation<Float> original, Entity target) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @WrapOperation(
@@ -42,20 +41,20 @@ public abstract class MobEntityMixin {
                     ordinal = 1
             )
     )
-    private float wrapOperation_tryAttack_getYaw_1(MobEntity attacker, Operation<Float> original, Entity target) {
+    private float wrapOperation_tryAttack_getYaw_1(Mob attacker, Operation<Float> original, Entity target) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if(gravityDirection == Direction.DOWN) {
             return original.call(attacker);
         }
 
-        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getPitch(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;
     }
 
     @Redirect(
-            method = "lookAtEntity",
+            method = "Lnet/minecraft/world/entity/Mob;lookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getEyeY()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getEyeY()D",
                     ordinal = 0
             )
     )
@@ -65,14 +64,14 @@ public abstract class MobEntityMixin {
             return livingEntity.getEyeY();
         }
 
-        return livingEntity.getEyePos().y;
+        return livingEntity.getEyePosition().y;
     }
 
     @Redirect(
-            method = "lookAtEntity",
+            method = "Lnet/minecraft/world/entity/Mob;lookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getX()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getX()D",
                     ordinal = 0
             )
     )
@@ -82,14 +81,14 @@ public abstract class MobEntityMixin {
             return entity.getX();
         }
 
-        return entity.getEyePos().x;
+        return entity.getEyePosition().x;
     }
 
     @Redirect(
-            method = "lookAtEntity",
+            method = "Lnet/minecraft/world/entity/Mob;lookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/Entity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/Entity;getZ()D",
                     ordinal = 0
             )
     )
@@ -99,6 +98,6 @@ public abstract class MobEntityMixin {
             return entity.getZ();
         }
 
-        return entity.getEyePos().z;
+        return entity.getEyePosition().z;
     }
 }

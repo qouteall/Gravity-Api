@@ -2,10 +2,9 @@ package gravity_changer.mixin;
 
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.CrossbowItem;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.CrossbowItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -13,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(CrossbowItem.class)
 public abstract class CrossbowItemMixin {
     @Redirect(
-            method = "shoot",
+            method = "Lnet/minecraft/world/item/CrossbowItem;shootProjectile(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;FZFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getX()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getX()D",
                     ordinal = 0
             )
     )
@@ -26,14 +25,14 @@ public abstract class CrossbowItemMixin {
             return livingEntity.getX();
         }
 
-        return livingEntity.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).x;
+        return livingEntity.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).x;
     }
 
     @Redirect(
-            method = "shoot",
+            method = "Lnet/minecraft/world/item/CrossbowItem;shootProjectile(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;FZFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getEyeY()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getEyeY()D",
                     ordinal = 0
             )
     )
@@ -43,14 +42,14 @@ public abstract class CrossbowItemMixin {
             return livingEntity.getEyeY();
         }
 
-        return livingEntity.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).y + 0.15000000596046448D;
+        return livingEntity.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).y + 0.15000000596046448D;
     }
 
     @Redirect(
-            method = "shoot",
+            method = "Lnet/minecraft/world/item/CrossbowItem;shootProjectile(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;FZFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/LivingEntity;getZ()D",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getZ()D",
                     ordinal = 0
             )
     )
@@ -60,6 +59,6 @@ public abstract class CrossbowItemMixin {
             return livingEntity.getZ();
         }
 
-        return livingEntity.getEyePos().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).z;
+        return livingEntity.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.15000000596046448D, 0.0D, gravityDirection)).z;
     }
 }
