@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerEntityMixin {
     
+    // TODO refactor this
     @Inject(
         method = "Lnet/minecraft/server/level/ServerPlayer;changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;",
         at = @At(
@@ -25,11 +26,11 @@ public abstract class ServerPlayerEntityMixin {
     )
     private void inject_moveToWorld_sendPacket_1(CallbackInfoReturnable<ServerPlayer> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayer) (Object) this);
-        if (gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayer) (Object) this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer) (Object) this, Direction.DOWN, new RotationParameters().rotationTime(0));
+        if (gravityDirection != GravityChangerAPI.getBaseGravityDirection((ServerPlayer) (Object) this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setBaseGravityDirection((ServerPlayer) (Object) this, Direction.DOWN, RotationParameters.getDefault().withRotationTimeMs(0));
         }
         else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayer) (Object) this), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setBaseGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getBaseGravityDirection((ServerPlayer) (Object) this), RotationParameters.getDefault().withRotationTimeMs(0));
         }
     }
     
@@ -44,11 +45,11 @@ public abstract class ServerPlayerEntityMixin {
     )
     private void inject_teleport_sendPacket_0(CallbackInfo ci) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((ServerPlayer) (Object) this);
-        if (gravityDirection != GravityChangerAPI.getDefaultGravityDirection((ServerPlayer) (Object) this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer) (Object) this, Direction.DOWN, new RotationParameters().rotationTime(0));
+        if (gravityDirection != GravityChangerAPI.getBaseGravityDirection((ServerPlayer) (Object) this) && GravityChangerMod.config.resetGravityOnDimensionChange) {
+            GravityChangerAPI.setBaseGravityDirection((ServerPlayer) (Object) this, Direction.DOWN, RotationParameters.getDefault().withRotationTimeMs(0));
         }
         else {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getDefaultGravityDirection((ServerPlayer) (Object) this), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setBaseGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getBaseGravityDirection((ServerPlayer) (Object) this), RotationParameters.getDefault().withRotationTimeMs(0));
         }
     }
     
@@ -58,7 +59,7 @@ public abstract class ServerPlayerEntityMixin {
     )
     private void inject_copyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
         if (!GravityChangerMod.config.resetGravityOnRespawn) {
-            GravityChangerAPI.setDefaultGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getDefaultGravityDirection(oldPlayer), new RotationParameters().rotationTime(0));
+            GravityChangerAPI.setBaseGravityDirection((ServerPlayer) (Object) this, GravityChangerAPI.getBaseGravityDirection(oldPlayer), RotationParameters.getDefault().withRotationTimeMs(0));
         }
     }
 }

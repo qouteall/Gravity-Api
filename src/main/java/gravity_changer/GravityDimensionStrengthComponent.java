@@ -1,4 +1,4 @@
-package gravity_changer.util;
+package gravity_changer;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -21,7 +21,7 @@ public class GravityDimensionStrengthComponent implements GravityDimensionStreng
     public void setDimensionGravityStrength(double strength) {
         if (!currentWorld.isClientSide) {
             gravityStrength = strength;
-            GravityDimensionStrengthWorldRegister.GRAVITY_DIMENSION_STRENGTH_MODIFIER.sync(currentWorld);
+            GravityChangerComponents.DIMENSION_COMP_KEY.sync(currentWorld);
         }
     }
     

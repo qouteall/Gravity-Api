@@ -3,14 +3,14 @@ package gravity_changer.api;
 import gravity_changer.GravityChangerMod;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
-public class RotationParameters {
-    private boolean rotateVelocity;
-    private boolean rotateView;
-    private boolean alternateCenter;
-    private int rotationTime;//Milliseconds
-    
-    public RotationParameters() {
-        this(
+public record RotationParameters(
+    boolean rotateVelocity,
+    boolean rotateView,
+    boolean alternateCenter,
+    int rotationTimeMS
+) {
+    public static RotationParameters getDefault() {
+        return new RotationParameters(
             GravityChangerMod.config.worldVelocity,
             !GravityChangerMod.config.keepWorldLook,
             false,
@@ -18,50 +18,12 @@ public class RotationParameters {
         );
     }
     
-    public RotationParameters(boolean _rotateVelocity, boolean _rotateView, boolean _alternateCenter, int _rotationTime) {
-        rotateVelocity = _rotateVelocity;
-        rotateView = _rotateView;
-        alternateCenter = _alternateCenter;
-        rotationTime = _rotationTime;
-    }
-    
-    public boolean rotateVelocity() {
-        return rotateVelocity;
-    }
-    
-    public boolean rotateView() {
-        return rotateView;
-    }
-    
-    public boolean alternateCenter() {
-        return alternateCenter;
-    }
-    
-    public int rotationTime() {
-        return rotationTime;
-    }
-    
-    @CanIgnoreReturnValue
-    public RotationParameters rotateVelocity(boolean rotateVelocity) {
-        this.rotateVelocity = rotateVelocity;
-        return this;
-    }
-    
-    @CanIgnoreReturnValue
-    public RotationParameters rotateView(boolean rotateView) {
-        this.rotateView = rotateView;
-        return this;
-    }
-    
-    @CanIgnoreReturnValue
-    public RotationParameters alternateCenter(boolean alternateCenter) {
-        this.alternateCenter = alternateCenter;
-        return this;
-    }
-    
-    @CanIgnoreReturnValue
-    public RotationParameters rotationTime(int rotationTime) {
-        this.rotationTime = rotationTime;
-        return this;
+    public RotationParameters withRotationTimeMs(int rotationTimeMS) {
+        return new RotationParameters(
+            rotateVelocity,
+            rotateView,
+            alternateCenter,
+            rotationTimeMS
+        );
     }
 }

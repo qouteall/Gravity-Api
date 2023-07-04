@@ -1,4 +1,4 @@
-package gravity_changer.util;
+package gravity_changer;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "gravity_changer_q_fork",
+  "id": "gravity_changer_q",
   "version": "${version}",
 
   "name": "Gravity Changer (qouteall fork)",
@@ -32,7 +32,7 @@
       "gravity_changer.ModMenuIntegration"
     ],
     "cardinal-components": [
-      "gravity_changer.GravityChangerComponentsInitializer"
+      "gravity_changer.GravityChangerComponents"
     ]
   },
   "mixins": [
@@ -50,7 +50,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "gravityapi:gravity_direction"
+      "gravity_changer:gravity_data",
+      "gravity_changer:dimension_data"
     ],
     "lithium:options": {
       "mixin.entity.collisions": false,

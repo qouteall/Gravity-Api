@@ -1,5 +1,6 @@
 package gravity_changer.mixin;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.GravityChangerMod;
 
 import gravity_changer.api.GravityChangerAPI;
@@ -127,6 +128,13 @@ public abstract class EntityMixin {
     private void inject_calculateBoundingBox(CallbackInfoReturnable<AABB> cir) {
         Entity entity = ((Entity) (Object) this);
         if (entity instanceof Projectile) return;
+    
+        // cardinal components initializes the component container in the end of constructor
+        // but bounding box calculation can happen inside constructor
+        // see dev.onyxstudios.cca.mixin.entity.common.MixinEntity
+        if (((ComponentProvider) entity).getComponentContainer() == null) {
+            return;
+        }
         
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) return;

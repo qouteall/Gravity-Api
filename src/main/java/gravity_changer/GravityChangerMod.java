@@ -3,7 +3,6 @@ package gravity_changer;
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.item.ModItems;
-import gravity_changer.util.GravityChannel;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -31,7 +30,6 @@ public class GravityChangerMod implements ModInitializer {
     @Override
     public void onInitialize() {
         ModItems.init();
-        GravityChannel.initServer();
         
         AutoConfig.register(GravityChangerConfig.class, GsonConfigSerializer::new);
         configHolder = AutoConfig.getConfigHolder(GravityChangerConfig.class);
@@ -58,7 +56,7 @@ public class GravityChangerMod implements ModInitializer {
                 entries.accept(new ItemStack(ModItems.GRAVITY_CHANGER_NORTH_AOE));
                 entries.accept(new ItemStack(ModItems.GRAVITY_CHANGER_SOUTH_AOE));
             })
-            .title(Component.translatable("itemGroup.gravity_changer"))
+            .title(Component.translatable("itemGroup.gravity_changer.general"))
             .build();
         
         Registry.register(

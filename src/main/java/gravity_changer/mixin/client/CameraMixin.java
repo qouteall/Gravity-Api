@@ -56,13 +56,8 @@ public abstract class CameraMixin {
     )
     private void wrapOperation_update_setPos_0(Camera camera, double x, double y, double z, Operation<Void> original, BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity); ;
-        Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
-        if (animationOptional.isEmpty()) {
-            original.call(this, x, y, z);
-            return;
-        }
-        RotationAnimation animation = animationOptional.get();
-        if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
+        RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
+        if (animation == null || gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
             original.call(this, x, y, z);
             return;
         }
@@ -99,10 +94,13 @@ public abstract class CameraMixin {
     private void inject_setRotation(CallbackInfo ci) {
         if (this.entity != null) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
-            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
-            if (animationOptional.isEmpty()) return;
-            RotationAnimation animation = animationOptional.get();
-            if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
+            RotationAnimation animation = GravityChangerAPI.getRotationAnimation(entity);
+            if (animation == null) {
+                return;
+            }
+            if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
+                return;
+            }
             long timeMs = entity.level().getGameTime() * 50 + (long) (storedTickDelta * 50);
             Quaternionf rotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
             rotation.conjugate();

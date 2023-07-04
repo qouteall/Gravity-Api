@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import gravity_changer.RotationAnimation;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-import gravity_changer.util.EntityTags;
+import gravity_changer.EntityTags;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -60,9 +60,10 @@ public abstract class EntityRenderDispatcherMixin {
             if (!this.shouldRenderShadow) return;
             
             matrices.pushPose();
-            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
-            if (animationOptional.isEmpty()) return;
-            RotationAnimation animation = animationOptional.get();
+            RotationAnimation animation = GravityChangerAPI.getRotationAnimation(entity);
+            if (animation == null) {
+                return;
+            }
             long timeMs = entity.level().getGameTime() * 50 + (long) (tickDelta * 50);
             matrices.mulPose(new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs)).conjugate());
         }

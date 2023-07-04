@@ -21,7 +21,7 @@ public class GravityChangerItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         if (!world.isClientSide())
-            GravityChangerAPI.setDefaultGravityDirection(user, gravityDirection, new RotationParameters());
+            GravityChangerAPI.setBaseGravityDirection(user, gravityDirection, RotationParameters.getDefault());
         return InteractionResultHolder.success(user.getItemInHand(hand));
     }
 }

@@ -37,9 +37,10 @@ public abstract class GameRendererMixin {
         if (this.mainCamera.getEntity() != null) {
             Entity focusedEntity = this.mainCamera.getEntity();
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
-            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
-            if (animationOptional.isEmpty()) return;
-            RotationAnimation animation = animationOptional.get();
+            RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
+            if (animation == null) {
+                return;
+            }
             long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (tickDelta * 50);
             Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
             matrix.mulPose(currentGravityRotation);

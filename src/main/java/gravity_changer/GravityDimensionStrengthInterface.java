@@ -1,4 +1,4 @@
-package gravity_changer.util;
+package gravity_changer;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
