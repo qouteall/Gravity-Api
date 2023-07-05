@@ -18,10 +18,15 @@ public class RotationAnimation {
     private boolean inAnimation = false;
     private Quaternionf startGravityRotation;
     private Quaternionf endGravityRotation;
+    
     private long startTimeMs;
     private long endTimeMs;
     
-    public void applyRotationAnimation(Direction newGravity, Direction prevGravity, long durationTimeMs, Entity entity, long timeMs, boolean rotateView) {
+    public void startRotationAnimation(
+        Direction newGravity, Direction prevGravity,
+        long durationTimeMs, Entity entity, long timeMs,
+        boolean rotateView
+    ) {
         if (durationTimeMs == 0) {
             inAnimation = false;
             return;
@@ -36,7 +41,6 @@ public class RotationAnimation {
         Quaternionf currentAnimatedGravityRotation = getCurrentGravityRotation(prevGravity, timeMs);
         
         // camera rotation = view rotation(pitch and yaw) * gravity rotation(animated)
-//        Quaternionf currentAnimatedCameraRotation = QuaternionUtil.mult(oldViewRotation, currentAnimatedGravityRotation);
         Quaternionf currentAnimatedCameraRotation = new Quaternionf().set(oldViewRotation).mul(currentAnimatedGravityRotation);
         
         Quaternionf newEndGravityRotation = RotationUtil.getWorldRotationQuaternion(newGravity);
@@ -62,9 +66,6 @@ public class RotationAnimation {
         Quaternionf newViewRotation = QuaternionUtil.getViewRotation(entity.getXRot(), entity.getYRot());
         
         // gravity rotation = (view rotation^-1) * camera rotation
-//        Quaternionf animationStartGravityRotation = QuaternionUtil.mult(
-//            QuaternionUtil.inversed(newViewRotation), currentAnimatedCameraRotation
-//        );
         Quaternionf animationStartGravityRotation = new Quaternionf().set(newViewRotation).conjugate().mul(currentAnimatedCameraRotation);
         
         inAnimation = true;

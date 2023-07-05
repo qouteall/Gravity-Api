@@ -7,6 +7,8 @@ import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.util.RotationUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,32 +20,141 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
-public class GravityDirectionComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
+public class GravityComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
     
     private static final Logger LOGGER = LogUtils.getLogger();
     
-    private Direction currGravityDirection = Direction.DOWN;
-    private Direction prevGravityDirection = Direction.DOWN;
+    // Whether to send sync packet. Only used on server side.
+    private boolean needsSync = false;
+    boolean initialized = false;
     
+    // updated every tick on server side. synchronized
+    private Direction currGravityDirection = Direction.DOWN;
+    private double currGravityStrength = 1.0;
+    
+    // not synchronized
+    private Direction prevGravityDirection = Direction.DOWN;
+    private double prevGravityStrength = 1.0;
+    
+    // the base gravity direction
     Direction baseGravityDirection = Direction.DOWN;
+    
+    // the base gravity strength
     double baseGravityStrength = 1.0;
     
-    public final RotationAnimation animation = new RotationAnimation();
-    boolean needsInitialSync = false;
+    // Synchronized. Its duration is used on client side animation.
+    RotationParameters currentRotationParameters = RotationParameters.getDefault();
     
-    private boolean needsSync = false;
+    // Only used on client, not synchronized.
+    @Nullable
+    public final RotationAnimation animation;
     
     private final Entity entity;
     
-    public GravityDirectionComponent(Entity entity) {
+    public GravityComponent(Entity entity) {
         this.entity = entity;
+        if (entity.level().isClientSide()) {
+            animation = new RotationAnimation();
+        }
+        else {
+            animation = null;
+        }
     }
     
-    public void onGravityChanged(
+    @Override
+    public void readFromNbt(CompoundTag tag) {
+        currGravityDirection = Direction.byName(tag.getString("currGravityDirection"));
+        currGravityStrength = tag.getDouble("currGravityStrength");
+        
+        baseGravityDirection = Direction.byName(tag.getString("baseGravityDirection"));
+        
+        baseGravityStrength = tag.getDouble("baseGravityStrength");
+        
+        currentRotationParameters = RotationParameters.fromTag(tag.getCompound("currentRotationParameters"));
+        
+        if (!initialized) {
+            prevGravityDirection = currGravityDirection;
+            prevGravityStrength = currGravityStrength;
+            initialized = true;
+            applyGravityDirectionChange(
+                prevGravityDirection, currGravityDirection, currentRotationParameters, true
+            );
+        }
+    }
+    
+    @Override
+    public void writeToNbt(@NotNull CompoundTag tag) {
+        tag.putString("currGravityDirection", currGravityDirection.getName());
+        tag.putDouble("currGravityStrength", currGravityStrength);
+        
+        tag.putString("baseGravityDirection", baseGravityDirection.getName());
+        
+        tag.putDouble("baseGravityStrength", baseGravityStrength);
+        
+        tag.put("currentRotationParameters", currentRotationParameters.toTag());
+    }
+    
+    @Override
+    public void tick() {
+        if (!entity.level().isClientSide()) {
+            // update effective gravity direction and strength
+            currGravityDirection = getEffectiveGravityDirection();
+            currGravityStrength = getEffectiveGravityStrength();
+    
+            refreshGravityDirection();
+            refreshGravityStrength();
+    
+            if (needsSync) {
+                needsSync = false;
+                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+            }
+        }
+        else {
+            refreshGravityDirection();
+            refreshGravityStrength();
+            needsSync = false;
+        }
+    }
+    
+    private void refreshGravityDirection() {
+        if (prevGravityDirection != currGravityDirection) {
+            applyGravityDirectionChange(prevGravityDirection, currGravityDirection, currentRotationParameters, false);
+            prevGravityDirection = currGravityDirection;
+            needsSync = true;
+        }
+    }
+    
+    private void refreshGravityStrength() {
+        if (Math.abs(currGravityStrength - prevGravityStrength) > 0.0001) {
+            prevGravityStrength = currGravityStrength;
+            needsSync = true;
+        }
+    }
+    
+    private Direction getEffectiveGravityDirection() {
+        Entity vehicle = entity.getVehicle();
+        if (vehicle != null) {
+            return GravityChangerAPI.getGravityDirection(vehicle);
+        }
+        
+        // TODO handle effects
+        
+        return baseGravityDirection;
+    }
+    
+    private double getEffectiveGravityStrength() {
+        // TODO handle effects
+        
+        return baseGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.level());
+    }
+    
+    public void applyGravityDirectionChange(
         Direction oldGravity, Direction newGravity,
         RotationParameters rotationParameters, boolean isInitialization
     ) {
@@ -57,7 +168,8 @@ public class GravityDirectionComponent implements Component, AutoSyncedComponent
         
         long timeMs = entity.level().getGameTime() * 50;
         if (entity.level().isClientSide()) {
-            animation.applyRotationAnimation(
+            Validate.notNull(animation, "gravity animation is null");
+            animation.startRotationAnimation(
                 newGravity, oldGravity,
                 rotationParameters.rotationTimeMS(),
                 entity, timeMs, rotationParameters.rotateView()
@@ -65,9 +177,9 @@ public class GravityDirectionComponent implements Component, AutoSyncedComponent
         }
         
         if (!(entity instanceof ServerPlayer)) {
-            //A relativeRotationCentre of zero will result in zero translation
-            Vec3 relativeRotationCentre = getCentreOfRotation(oldGravity, newGravity, rotationParameters);
-            Vec3 translation = RotationUtil.vecPlayerToWorld(relativeRotationCentre, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCentre, newGravity));
+            // A relativeRotationCenter of zero will result in zero translation
+            Vec3 relativeRotationCenter = getCenterOfRotationRelativeToFeet(entity, oldGravity, newGravity, rotationParameters);
+            Vec3 translation = RotationUtil.vecPlayerToWorld(relativeRotationCenter, oldGravity).subtract(RotationUtil.vecPlayerToWorld(relativeRotationCenter, newGravity));
             Direction relativeDirection = RotationUtil.dirWorldToPlayer(newGravity, oldGravity);
             Vec3 smidge = new Vec3(
                 relativeDirection == Direction.EAST ? -1.0E-6D : 0.0D,
@@ -111,24 +223,28 @@ public class GravityDirectionComponent implements Component, AutoSyncedComponent
     }
     
     @NotNull
-    private Vec3 getCentreOfRotation(Direction oldGravity, Direction newGravity, RotationParameters rotationParameters) {
-        Vec3 relativeRotationCentre = Vec3.ZERO;
+    private static Vec3 getCenterOfRotationRelativeToFeet(
+        Entity entity,
+        Direction oldGravity, Direction newGravity, RotationParameters rotationParameters
+    ) {
         if (entity instanceof EndCrystal) {
             //In the middle of the block below
-            relativeRotationCentre = new Vec3(0, -0.5, 0);
+            return new Vec3(0, -0.5, 0);
         }
-        else if (rotationParameters.alternateCenter()) {
+        
+        if (rotationParameters.alternateCenter()) {
             EntityDimensions dimensions = entity.getDimensions(entity.getPose());
             if (newGravity.getOpposite() == oldGravity) {
                 //In the center of the hit-box
-                relativeRotationCentre = new Vec3(0, dimensions.height / 2, 0);
+                return new Vec3(0, dimensions.height / 2, 0);
             }
             else {
                 //Around the ankles
-                relativeRotationCentre = new Vec3(0, dimensions.width / 2, 0);
+                return new Vec3(0, dimensions.width / 2, 0);
             }
         }
-        return relativeRotationCentre;
+        
+        return Vec3.ZERO;
     }
     
     // Adjust position to avoid suffocation in blocks when changing gravity
@@ -197,9 +313,11 @@ public class GravityDirectionComponent implements Component, AutoSyncedComponent
     }
     
     public void setBaseGravityStrength(double strength) {
-        if (canChangeGravity()) {
-            baseGravityStrength = strength;
+        if (!canChangeGravity()) {
+            return;
         }
+        
+        baseGravityStrength = strength;
     }
     
     public Direction getCurrGravityDirection() {
@@ -218,70 +336,21 @@ public class GravityDirectionComponent implements Component, AutoSyncedComponent
         return baseGravityDirection;
     }
     
-    public void updateGravity(RotationParameters rotationParameters, boolean initialGravity) {
-        if (!canChangeGravity()) {return;}
-        
-        Direction newGravity = getActualGravityDirection();
-        Direction oldGravity = currGravityDirection;
-        if (oldGravity != newGravity) {
-            prevGravityDirection = oldGravity;
-            currGravityDirection = newGravity;
-            onGravityChanged(oldGravity, newGravity, rotationParameters, initialGravity);
-        }
-    }
-    
-    public Direction getActualGravityDirection() {
-        Entity vehicle = entity.getVehicle();
-        if (vehicle != null) {
-            return GravityChangerAPI.getGravityDirection(vehicle);
-        }
-        
-        Direction g = getBaseGravityDirection();
-        
-        // TODO
-        
-        return g;
-    }
-    
     public void setBaseGravityDirection(Direction gravityDirection, RotationParameters rotationParameters, boolean initialGravity) {
-        if (!canChangeGravity()) {return;}
+        if (!canChangeGravity()) {
+            return;
+        }
         
         baseGravityDirection = gravityDirection;
-        updateGravity(rotationParameters, initialGravity);
-        markNeedsSync();
     }
     
     public void reset() {
         baseGravityDirection = Direction.DOWN;
-        updateGravity(RotationParameters.getDefault(), true);
-        markNeedsSync();
+        baseGravityStrength = 1.0;
     }
     
+    @Environment(EnvType.CLIENT)
     public RotationAnimation getRotationAnimation() {
         return animation;
-    }
-    
-    /**
-     * Mark it needs-sync then it will send sync packet during ticking.
-     * Note: This has no effect on client side.
-     */
-    public void markNeedsSync() {
-        needsSync = true;
-    }
-    
-    @Override
-    public void readFromNbt(CompoundTag nbt) {
-        // TODO
-    }
-    
-    @Override
-    public void writeToNbt(@NotNull CompoundTag nbt) {
-        // TODO
-    }
-    
-    @Override
-    public void tick() {
-        // TODO
-        
     }
 }

@@ -1,37 +1,37 @@
 package gravity_changer;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 
-public class GravityDimensionStrengthComponent implements GravityDimensionStrengthInterface {
-    double gravityStrength = 1;
+public class DimensionGravityDataComponent implements Component, AutoSyncedComponent {
+    double dimensionGravityStrength = 1;
     
     private final Level currentWorld;
     
-    public GravityDimensionStrengthComponent(Level world) {
+    public DimensionGravityDataComponent(Level world) {
         this.currentWorld = world;
     }
     
-    @Override
     public double getDimensionGravityStrength() {
-        return gravityStrength;
+        return dimensionGravityStrength;
     }
     
-    @Override
     public void setDimensionGravityStrength(double strength) {
         if (!currentWorld.isClientSide) {
-            gravityStrength = strength;
+            dimensionGravityStrength = strength;
             GravityChangerComponents.DIMENSION_COMP_KEY.sync(currentWorld);
         }
     }
     
     @Override
     public void readFromNbt(CompoundTag tag) {
-        gravityStrength = tag.getDouble("DimensionGravityStrength");
+        dimensionGravityStrength = tag.getDouble("DimensionGravityStrength");
     }
     
     @Override
     public void writeToNbt(CompoundTag tag) {
-        tag.putDouble("DimensionGravityStrength", gravityStrength);
+        tag.putDouble("DimensionGravityStrength", dimensionGravityStrength);
     }
 }

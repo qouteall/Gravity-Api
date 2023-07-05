@@ -14,22 +14,22 @@ public class GravityChangerComponents implements EntityComponentInitializer, Wor
     public static final ResourceLocation DATA_COMPONENT_ID =
         new ResourceLocation("gravity_changer", "gravity_data");
     
-    public static final ComponentKey<GravityDirectionComponent> GRAVITY_COMP_KEY =
-        ComponentRegistry.getOrCreate(DATA_COMPONENT_ID, GravityDirectionComponent.class);
+    public static final ComponentKey<GravityComponent> GRAVITY_COMP_KEY =
+        ComponentRegistry.getOrCreate(DATA_COMPONENT_ID, GravityComponent.class);
     
     public static final ResourceLocation DIMENSION_DATA_ID =
         new ResourceLocation("gravity_changer", "dimension_data");
     
-    public static final ComponentKey<GravityDimensionStrengthComponent> DIMENSION_COMP_KEY =
-        ComponentRegistry.getOrCreate(DIMENSION_DATA_ID, GravityDimensionStrengthComponent.class);
+    public static final ComponentKey<DimensionGravityDataComponent> DIMENSION_COMP_KEY =
+        ComponentRegistry.getOrCreate(DIMENSION_DATA_ID, DimensionGravityDataComponent.class);
     
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerFor(Entity.class, GRAVITY_COMP_KEY, GravityDirectionComponent::new);
+        registry.registerFor(Entity.class, GRAVITY_COMP_KEY, GravityComponent::new);
     }
     
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(DIMENSION_COMP_KEY, GravityDimensionStrengthComponent::new);
+        registry.register(DIMENSION_COMP_KEY, DimensionGravityDataComponent::new);
     }
 }

@@ -1,13 +1,13 @@
 package gravity_changer.api;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.GravityChangerComponents;
 import gravity_changer.EntityTags;
-import gravity_changer.GravityDimensionStrengthComponent;
-import gravity_changer.GravityDirectionComponent;
+import gravity_changer.GravityComponent;
+import gravity_changer.DimensionGravityDataComponent;
 import gravity_changer.RotationAnimation;
 import gravity_changer.util.RotationUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -16,10 +16,10 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityChangerAPI {
-    public static final ComponentKey<GravityDirectionComponent> GRAVITY_COMPONENT =
+    public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
         GravityChangerComponents.GRAVITY_COMP_KEY;
     
-    public static final ComponentKey<GravityDimensionStrengthComponent> DIMENSION_DATA_COMPONENT =
+    public static final ComponentKey<DimensionGravityDataComponent> DIMENSION_DATA_COMPONENT =
         GravityChangerComponents.DIMENSION_COMP_KEY;
     
     
@@ -39,7 +39,7 @@ public abstract class GravityChangerAPI {
     }
     
     public static void setBaseGravityStrength(Entity entity, double strength) {
-        GravityDirectionComponent component = getGravityComponent(entity);
+        GravityComponent component = getGravityComponent(entity);
         
         component.setBaseGravityStrength(strength);
     }
@@ -69,17 +69,17 @@ public abstract class GravityChangerAPI {
     public static void setBaseGravityDirection(
         Entity entity, Direction gravityDirection, RotationParameters rotationParameters
     ) {
-        GravityDirectionComponent component = getGravityComponent(entity);
+        GravityComponent component = getGravityComponent(entity);
         component.setBaseGravityDirection(gravityDirection, rotationParameters, false);
-        component.markNeedsSync();
     }
     
     @Nullable
+    @Environment(EnvType.CLIENT)
     public static RotationAnimation getRotationAnimation(Entity entity) {
         return getGravityComponent(entity).getRotationAnimation();
     }
     
-    public static GravityDirectionComponent getGravityComponent(Entity entity) {
+    public static GravityComponent getGravityComponent(Entity entity) {
         return GRAVITY_COMPONENT.get(entity);
     }
     

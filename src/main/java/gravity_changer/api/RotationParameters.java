@@ -2,6 +2,7 @@ package gravity_changer.api;
 
 import gravity_changer.GravityChangerMod;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import net.minecraft.nbt.CompoundTag;
 
 public record RotationParameters(
     boolean rotateVelocity,
@@ -24,6 +25,24 @@ public record RotationParameters(
             rotateView,
             alternateCenter,
             rotationTimeMS
+        );
+    }
+    
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putBoolean("RotateVelocity", rotateVelocity);
+        tag.putBoolean("RotateView", rotateView);
+        tag.putBoolean("AlternateCenter", alternateCenter);
+        tag.putInt("RotationTimeMS", rotationTimeMS);
+        return tag;
+    }
+    
+    public static RotationParameters fromTag(CompoundTag tag) {
+        return new RotationParameters(
+            tag.getBoolean("RotateVelocity"),
+            tag.getBoolean("RotateView"),
+            tag.getBoolean("AlternateCenter"),
+            tag.getInt("RotationTimeMS")
         );
     }
 }
