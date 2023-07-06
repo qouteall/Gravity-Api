@@ -13,30 +13,29 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerEntityMixin_FallDistance {
     
-    // seems encountered a bug in MixinExtras?
-//    // make sure fall distance is correct on server side of the player
-//    @WrapOperation(
-//        method = "doCheckFallDamage",
-//        at = @At(
-//            value = "INVOKE",
-//            target = "Lnet/minecraft/world/entity/player/Player;checkFallDamage(DZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V"
-//        )
-//    )
-//    private void wrapCheckFallDamage(
-//        // target arguments
-//        ServerPlayer this_, double y, boolean onGround, BlockState state, BlockPos pos,
-//        Operation<Void> original,
-//        // outer arguments
-//        double dx, double dy, double dz, boolean bl
-//    ) {
-//        Direction gravity = GravityChangerAPI.getGravityDirection(this_);
-//
-//        Vec3 localVec = RotationUtil.vecWorldToPlayer(dx, dy, dz, gravity);
-//        original.call(((ServerPlayer) this_), localVec.y, onGround, state, pos);
-//    }
+    // make sure fall distance is correct on server side of the player
+    @ModifyArgs(
+        method = "doCheckFallDamage",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/player/Player;checkFallDamage(DZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V"
+        )
+    )
+    private void wrapCheckFallDamage(
+        Args args,
+        double dx, double dy, double dz, boolean onGround
+    ) {
+        ServerPlayer this_ = (ServerPlayer) (Object) this;
+        Direction gravity = GravityChangerAPI.getGravityDirection(this_);
+
+        Vec3 localVec = RotationUtil.vecWorldToPlayer(dx, dy, dz, gravity);
+        args.set(0, localVec.y());
+    }
     
 }

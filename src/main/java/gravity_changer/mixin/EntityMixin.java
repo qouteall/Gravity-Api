@@ -643,14 +643,14 @@ public abstract class EntityMixin {
             return;
         }
         
-//        if (GravityChangerConfig.voidDamageOnHorizontalFallTooFar &&
-//            GravityChangerAPI.getGravityDirection(this_).getAxis() != Direction.Axis.Y &&
-//            fallDistance > 1024
-//        ) {
-//            this.onBelowWorld();
-//            ci.cancel();
-//            return;
-//        }
+        if (GravityChangerConfig.voidDamageOnHorizontalFallTooFar &&
+            GravityChangerAPI.getGravityDirection(this_).getAxis() != Direction.Axis.Y &&
+            fallDistance > 1024
+        ) {
+            this.onBelowWorld();
+            ci.cancel();
+            return;
+        }
     }
     
     @ModifyArgs(

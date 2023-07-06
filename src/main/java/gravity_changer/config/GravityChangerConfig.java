@@ -15,5 +15,5 @@ public class GravityChangerConfig implements ConfigData {
     public static double worldDefaultGravityStrength = 1;
     public static boolean resetGravityOnRespawn = true;
     public static boolean voidDamageAboveWorld = false;
-//    public static boolean voidDamageOnHorizontalFallTooFar = false;
+    public static boolean voidDamageOnHorizontalFallTooFar = false;
 }
