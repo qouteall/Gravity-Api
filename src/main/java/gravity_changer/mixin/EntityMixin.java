@@ -4,6 +4,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.GravityChangerMod;
 
 import gravity_changer.api.GravityChangerAPI;
+import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -120,6 +121,9 @@ public abstract class EntityMixin {
     @Final
     protected RandomSource random;
     
+    @Shadow
+    public float fallDistance;
+    
     @Inject(
         method = "Lnet/minecraft/world/entity/Entity;makeBoundingBox()Lnet/minecraft/world/phys/AABB;",
         at = @At("RETURN"),
@@ -128,7 +132,7 @@ public abstract class EntityMixin {
     private void inject_calculateBoundingBox(CallbackInfoReturnable<AABB> cir) {
         Entity entity = ((Entity) (Object) this);
         if (entity instanceof Projectile) return;
-    
+        
         // cardinal components initializes the component container in the end of constructor
         // but bounding box calculation can happen inside constructor
         // see dev.onyxstudios.cca.mixin.entity.common.MixinEntity
@@ -625,12 +629,28 @@ public abstract class EntityMixin {
     
     @Inject(
         method = "Lnet/minecraft/world/entity/Entity;checkBelowWorld()V",
-        at = @At("HEAD")
+        at = @At("HEAD"),
+        cancellable = true
     )
     private void inject_attemptTickInVoid(CallbackInfo ci) {
-        if (GravityChangerMod.config.voidDamageAboveWorld && this.getY() > (double) (this.level.getMaxBuildHeight() + 256)) {
+        Entity this_ = (Entity) (Object) this;
+        
+        if (GravityChangerConfig.voidDamageAboveWorld &&
+            this.getY() > (double) (this.level.getMaxBuildHeight() + 256)
+        ) {
             this.onBelowWorld();
+            ci.cancel();
+            return;
         }
+        
+//        if (GravityChangerConfig.voidDamageOnHorizontalFallTooFar &&
+//            GravityChangerAPI.getGravityDirection(this_).getAxis() != Direction.Axis.Y &&
+//            fallDistance > 1024
+//        ) {
+//            this.onBelowWorld();
+//            ci.cancel();
+//            return;
+//        }
     }
     
     @ModifyArgs(

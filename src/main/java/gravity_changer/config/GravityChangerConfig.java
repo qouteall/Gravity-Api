@@ -10,11 +10,10 @@ public class GravityChangerConfig implements ConfigData {
     public static boolean keepWorldLook = false;
     public static int rotationTime = 500;
     
-    public static boolean server;
     public static boolean worldVelocity = false;
     
     public static double worldDefaultGravityStrength = 1;
-    public static boolean resetGravityOnDimensionChange = true;
     public static boolean resetGravityOnRespawn = true;
     public static boolean voidDamageAboveWorld = false;
+//    public static boolean voidDamageOnHorizontalFallTooFar = false;
 }

@@ -52,5 +52,11 @@
   "text.autoconfig.gravity_changer.option.resetGravityOnRespawn.@Tooltip[1]": "to Your Gravity Default every time you respawn",
   "text.autoconfig.gravity_changer.option.voidDamageAboveWorld": "Void Damage Above World",
   "text.autoconfig.gravity_changer.option.voidDamageAboveWorld.@Tooltip[0]": "Makes it so that you start taking void damage",
-  "text.autoconfig.gravity_changer.option.voidDamageAboveWorld.@Tooltip[1]": "if you are above y = max_world_height + 256"
+  "text.autoconfig.gravity_changer.option.voidDamageAboveWorld.@Tooltip[1]": "if you are above y = max_world_height + 256",
+
+  "text.autoconfig.gravity_changer.option.worldDefaultGravityStrength": "World Default Gravity Strength",
+
+  "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar": "Void Damage On Horizontal Fall Too Far",
+  "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar.@Tooltip[0]": "When the gravity is horizontal and falling for at least 1024 blocks,",
+    "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar.@Tooltip[1]": "the entity will start taking void damage"
 }

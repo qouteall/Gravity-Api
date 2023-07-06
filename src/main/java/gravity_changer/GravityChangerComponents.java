@@ -4,8 +4,10 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
+import gravity_changer.config.GravityChangerConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
@@ -25,6 +27,17 @@ public class GravityChangerComponents implements EntityComponentInitializer, Wor
     
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerForPlayers(
+            GRAVITY_COMP_KEY, GravityComponent::new,
+            new RespawnCopyStrategy<GravityComponent>() {
+                @Override
+                public void copyForRespawn(GravityComponent from, GravityComponent to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+                    if (lossless || !GravityChangerConfig.resetGravityOnRespawn) {
+                        RespawnCopyStrategy.copy(from, to);
+                    }
+                }
+            }
+        );
         registry.registerFor(Entity.class, GRAVITY_COMP_KEY, GravityComponent::new);
     }
     

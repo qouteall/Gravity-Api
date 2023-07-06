@@ -40,7 +40,7 @@
     "PotionEntityMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
-    "ServerPlayerEntityMixin",
+    "fall_distance.ServerPlayerEntityMixin_FallDistance",
     "ServerPlayNetworkHandlerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerEntityMixin",

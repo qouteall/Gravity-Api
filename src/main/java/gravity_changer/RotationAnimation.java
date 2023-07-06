@@ -110,9 +110,6 @@ public class RotationAnimation {
         
         double delta = (double) (timeMs - startTimeMs) / (endTimeMs - startTimeMs);
         
-        // make sure that frustum culling updates when running rotation animation
-        Minecraft.getInstance().levelRenderer.needsUpdate();
-        
         return RotationUtil.interpolate(
             startGravityRotation, endGravityRotation,
             mapProgress((float) delta)
@@ -125,41 +122,5 @@ public class RotationAnimation {
     
     public boolean isInAnimation() {
         return inAnimation;
-    }
-    
-    public void toNbt(CompoundTag nbt) {
-        nbt.putBoolean("InAnimation", inAnimation);
-        if (inAnimation) {
-            nbt.putFloat("Q0X", startGravityRotation.x());
-            nbt.putFloat("Q0Y", startGravityRotation.y());
-            nbt.putFloat("Q0Z", startGravityRotation.z());
-            nbt.putFloat("Q0W", startGravityRotation.w());
-            nbt.putFloat("Q1X", endGravityRotation.x());
-            nbt.putFloat("Q1Y", endGravityRotation.y());
-            nbt.putFloat("Q1Z", endGravityRotation.z());
-            nbt.putFloat("Q1W", endGravityRotation.w());
-            nbt.putLong("StartTime", startTimeMs);
-            nbt.putLong("EndTime", endTimeMs);
-        }
-    }
-    
-    public void fromNbt(CompoundTag nbt) {
-        inAnimation = nbt.getBoolean("InAnimation");//Will return false if no such element exists
-        if (inAnimation) {
-            startGravityRotation = new Quaternionf(
-                nbt.getFloat("Q0X"),
-                nbt.getFloat("Q0Y"),
-                nbt.getFloat("Q0Z"),
-                nbt.getFloat("Q0W")
-            );
-            endGravityRotation = new Quaternionf(
-                nbt.getFloat("Q1X"),
-                nbt.getFloat("Q1Y"),
-                nbt.getFloat("Q1Z"),
-                nbt.getFloat("Q1W")
-            );
-            startTimeMs = nbt.getLong("StartTime");
-            endTimeMs = nbt.getLong("EndTime");
-        }
     }
 }

@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
@@ -106,16 +107,24 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             // update effective gravity direction and strength
             currGravityDirection = getEffectiveGravityDirection();
             currGravityStrength = getEffectiveGravityStrength();
-    
+            
             refreshGravityDirection();
             refreshGravityStrength();
-    
+            
             if (needsSync) {
                 needsSync = false;
                 GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
             }
         }
-        else {
+    }
+    
+    @Override
+    public void applySyncPacket(FriendlyByteBuf buf) {
+        AutoSyncedComponent.super.applySyncPacket(buf);
+        
+        if (entity.level().isClientSide()) {
+            // the packet should be handled on client thread
+            // start the gravity animation (doing that during ticking is too late)
             refreshGravityDirection();
             refreshGravityStrength();
             needsSync = false;

@@ -3,6 +3,7 @@ package gravity_changer.mixin.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import gravity_changer.RotationAnimation;
 import gravity_changer.api.GravityChangerAPI;
+import net.minecraft.client.Minecraft;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,6 +44,12 @@ public abstract class GameRendererMixin {
             }
             long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (tickDelta * 50);
             Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
+    
+            if (animation.isInAnimation()) {
+                // make sure that frustum culling updates when running rotation animation
+                Minecraft.getInstance().levelRenderer.needsUpdate();
+            }
+            
             matrix.mulPose(currentGravityRotation);
         }
     }

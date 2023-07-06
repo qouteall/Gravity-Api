@@ -2,7 +2,11 @@ package gravity_changer.mixin.client;
 
 import java.util.Optional;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -39,13 +43,6 @@ public abstract class CameraMixin {
     @Shadow
     private float eyeHeight;
     
-    private float storedTickDelta = 0.f;
-    
-    @Inject(method = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V", at = @At("HEAD"))
-    private void inject_update(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
-        storedTickDelta = tickDelta;
-    }
-    
     @WrapOperation(
         method = "setup",
         at = @At(
@@ -54,14 +51,19 @@ public abstract class CameraMixin {
             ordinal = 0
         )
     )
-    private void wrapOperation_update_setPos_0(Camera camera, double x, double y, double z, Operation<Void> original, BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
+    private void wrapOperation_update_setPos_0(
+        Camera camera, double x, double y, double z,
+        Operation<Void> original, BlockGetter area, Entity focusedEntity,
+        boolean thirdPerson, boolean inverseView, float tickDelta
+    ) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity); ;
         RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
-        if (animation == null || gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
+        if (animation == null || (gravityDirection == Direction.DOWN && !animation.isInAnimation())) {
             original.call(this, x, y, z);
             return;
         }
-        long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (storedTickDelta * 50);
+        float partialTick = Minecraft.getInstance().getFrameTime();
+        long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (partialTick * 50);
         Quaternionf gravityRotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
         gravityRotation.conjugate();
         
@@ -101,7 +103,8 @@ public abstract class CameraMixin {
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
                 return;
             }
-            long timeMs = entity.level().getGameTime() * 50 + (long) (storedTickDelta * 50);
+            float partialTick = Minecraft.getInstance().getFrameTime();
+            long timeMs = entity.level().getGameTime() * 50 + (long) (partialTick * 50);
             Quaternionf rotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
             rotation.conjugate();
             rotation.mul(this.rotation);
