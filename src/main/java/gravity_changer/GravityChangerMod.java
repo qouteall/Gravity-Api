@@ -2,6 +2,8 @@ package gravity_changer;
 
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
+import gravity_changer.effect.GravityDirectionEffect;
+import gravity_changer.effect.GravityInvertEffect;
 import gravity_changer.item.ModItems;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
@@ -63,6 +65,9 @@ public class GravityChangerMod implements ModInitializer {
             BuiltInRegistries.CREATIVE_MODE_TAB, id("general"),
             GravityChangerGroup
         );
+        
+        GravityDirectionEffect.init();
+        GravityInvertEffect.init();
     }
     
     public static ResourceLocation id(String path) {

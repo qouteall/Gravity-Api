@@ -6,16 +6,21 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
+import gravity_changer.effect.GravityDirectionEffect;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.AABB;
@@ -29,7 +34,39 @@ import org.slf4j.Logger;
 
 public class GravityComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
     
+    public static interface GravityDirModifierCallback {
+        Direction transform(GravityComponent component, Direction direction);
+    }
+    
+    public static interface GravityStrengthModifierCallback {
+        double transform(GravityComponent component, double strength);
+    }
+    
     private static final Logger LOGGER = LogUtils.getLogger();
+    
+    public static final Event<GravityDirModifierCallback> GRAVITY_DIR_MODIFIER_EVENT =
+        EventFactory.createArrayBacked(
+            GravityDirModifierCallback.class,
+            (listeners) -> (component, direction) -> {
+                Direction curr = direction;
+                for (GravityDirModifierCallback callback : listeners) {
+                    curr = callback.transform(component, curr);
+                }
+                return curr;
+            }
+        );
+    
+    public static final Event<GravityStrengthModifierCallback> GRAVITY_STRENGTH_MODIFIER_EVENT =
+        EventFactory.createArrayBacked(
+            GravityStrengthModifierCallback.class,
+            (listeners) -> (component, strength) -> {
+                double curr = strength;
+                for (GravityStrengthModifierCallback callback : listeners) {
+                    curr = callback.transform(component, curr);
+                }
+                return curr;
+            }
+        );
     
     // Whether to send sync packet. Only used on server side.
     private boolean needsSync = false;
@@ -56,7 +93,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     @Nullable
     public final RotationAnimation animation;
     
-    private final Entity entity;
+    public final Entity entity;
     
     public GravityComponent(Entity entity) {
         this.entity = entity;
@@ -103,6 +140,10 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     @Override
     public void tick() {
+        if (!canChangeGravity()) {
+            return;
+        }
+        
         if (!entity.level().isClientSide()) {
             // update effective gravity direction and strength
             currGravityDirection = getEffectiveGravityDirection();
@@ -151,10 +192,11 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         if (vehicle != null) {
             return GravityChangerAPI.getGravityDirection(vehicle);
         }
-        
-        // TODO handle effects
-        
-        return baseGravityDirection;
+    
+        Direction result = GRAVITY_DIR_MODIFIER_EVENT.invoker().transform(
+            this, baseGravityDirection
+        );
+        return result;
     }
     
     private double getEffectiveGravityStrength() {
