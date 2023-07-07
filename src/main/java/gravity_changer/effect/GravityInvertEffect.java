@@ -1,6 +1,8 @@
 package gravity_changer.effect;
 
 import gravity_changer.GravityComponent;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -13,6 +15,8 @@ public class GravityInvertEffect extends MobEffect {
     
     public static final ResourceLocation PHASE = new ResourceLocation("gravity_changer:invert_effect_phase");
     
+    public static final ResourceLocation ID = new ResourceLocation("gravity_changer:invert");
+    
     public static final GravityInvertEffect INSTANCE = new GravityInvertEffect();
     
     private GravityInvertEffect() {
@@ -23,13 +27,13 @@ public class GravityInvertEffect extends MobEffect {
         GravityComponent.GRAVITY_DIR_MODIFIER_EVENT.register(
             PHASE, (component, direction) -> {
                 Entity entity = component.entity;
-        
+                
                 if (entity instanceof LivingEntity livingEntity) {
                     if (livingEntity.hasEffect(INSTANCE)) {
                         return direction.getOpposite();
                     }
                 }
-        
+                
                 return direction;
             }
         );
@@ -37,6 +41,10 @@ public class GravityInvertEffect extends MobEffect {
         // apply invert after gravity effect
         GravityComponent.GRAVITY_STRENGTH_MODIFIER_EVENT.addPhaseOrdering(
             GravityDirectionEffect.PHASE, GravityInvertEffect.PHASE
+        );
+        
+        Registry.register(
+            BuiltInRegistries.MOB_EFFECT, ID, INSTANCE
         );
     }
     
