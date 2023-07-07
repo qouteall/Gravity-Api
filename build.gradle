@@ -31,6 +31,10 @@ repositories {
 		}
 	}
 
+	// for parchment
+	maven {
+		url = "https://maven.parchmentmc.org"
+	}
 }
 
 dependencies {
