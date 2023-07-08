@@ -2,10 +2,12 @@ package gravity_changer.gravity_plate;
 
 import java.util.List;
 
+import com.mojang.logging.LogUtils;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityComponent;
 import gravity_changer.GravityEffect;
 import gravity_changer.api.GravityChangerAPI;
+import gravity_changer.config.GravityChangerConfig;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,11 +22,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 /**
  * Based on code from AmethystGravity (by CyborgCabbage)
  */
 public class PlatingBlockEntity extends BlockEntity {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    
     public static final ResourceLocation ID = new ResourceLocation("gravity_changer:plating_block_entity");
     public static BlockEntityType<PlatingBlockEntity> TYPE;
     
@@ -44,46 +50,99 @@ public class PlatingBlockEntity extends BlockEntity {
             return;
         }
         
-        PlatingBlock.foreachDirection(blockState, dir -> {
-            AABB box = platingBlock.getGravityEffectBox(blockPos, dir);
+        AABB roughBox = platingBlock.getRoughEffectBox(blockPos);
+        
+        List<Entity> entities = world.getEntitiesOfClass(
+            Entity.class,
+            roughBox,
+            e -> EntityTags.canChangeGravity(e)
+        );
+        
+        for (Entity entity : entities) {
+            boolean applies = false;
             
-            List<Entity> entities = world.getEntitiesOfClass(
-                Entity.class,
-                box,
-                e -> EntityTags.canChangeGravity(e) && box.contains(e.position())
-            );
+            GravityComponent comp = GravityChangerAPI.getGravityComponent(entity);
+            Direction entityGravityDir = comp.getCurrGravityDirection();
             
-            if (!entities.isEmpty()) {
-                Vec3i dirVec = dir.getNormal();
-                Vec3 effectCenter = Vec3.atCenterOf(blockPos).add(
-                    dirVec.getX() * -0.5, dirVec.getY() * -0.5, dirVec.getZ() * -0.5
-                );
-                for (Entity entity : entities) {
-                    GravityComponent comp = GravityChangerAPI.getGravityComponent(entity);
-                    // the priority is higher when closer
+            for (Direction plateDir : Direction.values()) {
+                if (PlatingBlock.hasDir(blockState, plateDir)) {
+                    // for opposite gravity case, test the eye pos with the field box,
+                    // otherwise test the feet pos
+                    Vec3 testingPos = entityGravityDir != plateDir.getOpposite() ?
+                        entity.position() : entity.getEyePosition();
+                    
+                    if (!platingBlock.getGravityEffectBox(blockPos, plateDir).contains(testingPos)) {
+                        continue;
+                    }
+                    
+                    Vec3i plateDirVec = plateDir.getNormal();
+                    Vec3 effectCenter = Vec3.atCenterOf(blockPos).add(
+                        plateDirVec.getX() * 0.5, plateDirVec.getY() * 0.5, plateDirVec.getZ() * 0.5
+                    );
+                    
                     double distance = entity.position().distanceToSqr(effectCenter);
                     double priority = -distance;
                     GravityEffect gravityEffect = new GravityEffect(
-                        dir, 1, priority, effectCenter, world.dimension()
+                        plateDir, 1, priority, effectCenter, world.dimension()
                     );
                     comp.applyGravityEffect(gravityEffect);
-                    
-                    // apply levitation when the entity is close to corner
-                    Direction currGravityDirection = comp.getCurrGravityDirection();
-                    boolean orthogonal = currGravityDirection.getAxis() != dir.getAxis();
-                    if (orthogonal) {
-                        double distanceToPlate = Math.abs(entity.position().subtract(effectCenter)
-                            .dot(Vec3.atLowerCornerOf(dir.getNormal())));
-                        if (distanceToPlate < 1.0) {
-                            double levitationForce = 0.04 / (distanceToPlate + 0.3);
-                            entity.addDeltaMovement(new Vec3(
-                                0, levitationForce, 0
-                            ));
-                        }
-                    }
+                    applies = true;
                 }
             }
-        });
+            
+            if (applies && GravityChangerConfig.autoJumpOnGravityPlateInnerCorner) {
+                tryToDoCornerAutoJump(blockState, blockPos, entity, comp);
+            }
+        }
+    }
+    
+    // when approaching an inward corner, do auto-jump to make it smoothly go forward
+    private static void tryToDoCornerAutoJump(
+        BlockState blockState, BlockPos blockPos,
+        Entity entity, GravityComponent comp
+    ) {
+        if (!entity.onGround()) {
+            return;
+        }
+        
+        // apply levitation when the entity is close to corner
+        Direction entityGravityDir = comp.getCurrGravityDirection();
+        
+        for (Direction plateDir : Direction.values()) {
+            if (PlatingBlock.hasDir(blockState, plateDir)) {
+                boolean orthogonal = entityGravityDir.getAxis() != plateDir.getAxis();
+                if (!orthogonal) {
+                    continue;
+                }
+                
+                Vec3 plateDirVec = Vec3.atLowerCornerOf(plateDir.getNormal());
+                
+                Vec3 effectCenter = Vec3.atCenterOf(blockPos).add(plateDirVec.scale(0.5));
+                Vec3 offset = effectCenter.subtract(entity.position());
+                if (offset.dot(Vec3.atLowerCornerOf(entityGravityDir.getNormal())) > 0) {
+                    // that plate is lower than entity
+                    continue;
+                }
+                
+                Vec3 worldVelocity = GravityChangerAPI.getWorldVelocity(entity);
+                if (worldVelocity.normalize().dot(plateDirVec) <= 0) {
+                    continue;
+                }
+                
+                double distanceToPlate = Math.abs(entity.position().subtract(effectCenter).dot(plateDirVec));
+                if (distanceToPlate < 0.8) {
+                    double strengthSqrt = Math.sqrt(comp.getCurrGravityStrength());
+                    entity.addDeltaMovement(new Vec3(
+                        0, 0.4 * strengthSqrt, 0
+                    ));
+                    if (entity.level().isClientSide()) {
+                        LOGGER.info("Client entity auto-jump on gravity plate corner {}", entity);
+                    }
+                    return;
+                }
+            }
+        }
+        
     }
 }
 

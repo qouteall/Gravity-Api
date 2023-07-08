@@ -16,6 +16,7 @@ import gravity_changer.api.GravityChangerAPI;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,25 +57,35 @@ public abstract class CameraMixin {
         Operation<Void> original, BlockGetter area, Entity focusedEntity,
         boolean thirdPerson, boolean inverseView, float tickDelta
     ) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity); ;
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
         RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
-        if (animation == null || (gravityDirection == Direction.DOWN && !animation.isInAnimation())) {
+        
+        if (animation == null) {
             original.call(this, x, y, z);
             return;
         }
+        
         float partialTick = Minecraft.getInstance().getFrameTime();
         long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (partialTick * 50);
-        Quaternionf gravityRotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
-        gravityRotation.conjugate();
+        animation.update(timeMs);
+        if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
+            original.call(this, x, y, z);
+            return;
+        }
+    
+        Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
         
         double entityX = Mth.lerp((double) tickDelta, focusedEntity.xo, focusedEntity.getX());
         double entityY = Mth.lerp((double) tickDelta, focusedEntity.yo, focusedEntity.getY());
         double entityZ = Mth.lerp((double) tickDelta, focusedEntity.zo, focusedEntity.getZ());
         
         double currentCameraY = Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight);
-        
-        Vector3f eyeOffset = new Vector3f(0, (float) currentCameraY, 0);
-        eyeOffset.rotate(gravityRotation);
+    
+        Vec3 eyeOffset = animation.getEyeOffset(
+            gravityRotation,
+            new Vec3(0, currentCameraY, 0),
+            gravityDirection
+        );
         
         original.call(
             this,

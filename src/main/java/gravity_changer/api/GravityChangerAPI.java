@@ -31,7 +31,7 @@ public abstract class GravityChangerAPI {
     }
     
     public static double getGravityStrength(Entity entity) {
-        return getGravityComponent(entity).getActualGravityStrength();
+        return getGravityComponent(entity).getCurrGravityStrength();
     }
     
     public static double getBaseGravityStrength(Entity entity) {

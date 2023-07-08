@@ -14,15 +14,15 @@ public class GravityField {
     }
     
     public static void init() {
-        GravityComponent.GRAVITY_DIR_MODIFIER_EVENT.register(new GravityComponent.GravityDirModifierCallback() {
-            @Override
-            public Direction transform(GravityComponent component, Direction direction) {
-                if (isOnField(component.entity)) {
-                    return Direction.NORTH;
-                }
-                
-                return direction;
-            }
-        });
+//        GravityComponent.GRAVITY_DIR_MODIFIER_EVENT.register(new GravityComponent.GravityDirModifierCallback() {
+//            @Override
+//            public Direction transform(GravityComponent component, Direction direction) {
+//                if (isOnField(component.entity)) {
+//                    return Direction.NORTH;
+//                }
+//
+//                return direction;
+//            }
+//        });
     }
 }

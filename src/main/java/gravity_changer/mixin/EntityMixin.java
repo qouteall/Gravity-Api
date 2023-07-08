@@ -160,9 +160,10 @@ public abstract class EntityMixin {
         if (gravityDirection == Direction.DOWN) return;
         
         AABB box = cir.getReturnValue().move(this.position.reverse());
-        if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
-            box = box.move(0.0D, -1.0E-6D, 0.0D);
-        }
+        box = box.inflate(-0.01); // avoid entering crouching because of floating point inaccuracy
+//        if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+//
+//        }
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
     }
     

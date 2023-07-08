@@ -1,7 +1,6 @@
 package gravity_changer.gravity_plate;
 
 import com.google.common.collect.ImmutableMap;
-import gravity_changer.GravityEffect;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
@@ -10,6 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -61,33 +61,36 @@ public class PlatingBlock extends BaseEntityBlock {
     protected static final VoxelShape EAST_SHAPE = Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
     private final Map<BlockState, VoxelShape> shapesByState;
     
-    public final double GRAVITY_EFFECT_HEIGHT;
+    public final double gravityEffectHeight;
     
     public static final Block PLATING_BLOCK = new PlatingBlock(
         0.6, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
     );
     public static final Block DENSE_PLATING_BLOCK = new PlatingBlock(
-        1.3, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
+        2.0, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
     );
     
-    public static void init() {
-        registerBlockAndItem(PLATING_BLOCK, new ResourceLocation("gravity_changer:plating"));
-        registerBlockAndItem(DENSE_PLATING_BLOCK, new ResourceLocation("gravity_changer:dense_plating"));
-    }
+    public static final Item PLATING_BLOCK_ITEM = new BlockItem(PLATING_BLOCK, new FabricItemSettings());
+    public static final Item DENSE_PLATING_BLOCK_ITEM = new BlockItem(DENSE_PLATING_BLOCK, new FabricItemSettings());
     
-    private static void registerBlockAndItem(Block block, ResourceLocation id) {
+    public static void init() {
         Registry.register(
-            BuiltInRegistries.BLOCK, id, block
+            BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:plating"), PLATING_BLOCK
         );
         Registry.register(
-            BuiltInRegistries.ITEM, id,
-            new BlockItem(block, new FabricItemSettings())
+            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:plating"), PLATING_BLOCK_ITEM
+        );
+        Registry.register(
+            BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:dense_plating"), DENSE_PLATING_BLOCK
+        );
+        Registry.register(
+            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:dense_plating"), DENSE_PLATING_BLOCK_ITEM
         );
     }
     
     public PlatingBlock(double height, Properties settings) {
         super(settings);
-        GRAVITY_EFFECT_HEIGHT = height;
+        gravityEffectHeight = height;
         registerDefaultState(getStateDefinition().any()
             .setValue(NORTH, false)
             .setValue(EAST, false)
@@ -137,7 +140,7 @@ public class PlatingBlock extends BaseEntityBlock {
     }
     
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-        if (state.getValue(directionToProperty(direction)) && !canPlaceOn(world, pos.relative(direction), direction.getOpposite())) {
+        if (hasDir(state, direction) && !canPlaceOn(world, pos.relative(direction), direction.getOpposite())) {
             state = state.setValue(directionToProperty(direction), false);
             if (getDirections(state).size() == 0) {
                 return Blocks.AIR.defaultBlockState();
@@ -203,7 +206,7 @@ public class PlatingBlock extends BaseEntityBlock {
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         if (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem()) {
-            return !state.getValue(directionToProperty(context.getClickedFace().getOpposite()));
+            return !hasDir(state, context.getClickedFace().getOpposite());
         }
         return super.canBeReplaced(state, context);
     }
@@ -251,10 +254,15 @@ public class PlatingBlock extends BaseEntityBlock {
     
     public static void foreachDirection(BlockState blockState, Consumer<Direction> func) {
         for (Direction dir : Direction.values()) {
-            if (blockState.getValue(directionToProperty(dir))) {
+            if (hasDir(blockState, dir)) {
                 func.accept(dir);
             }
         }
+    }
+    
+    // Note: the direction is gravity field direction. the facing is the opposite
+    public static boolean hasDir(BlockState blockState, Direction dir) {
+        return blockState.getValue(directionToProperty(dir));
     }
     
     public static ArrayList<Direction> getDirections(BlockState blockState) {
@@ -264,7 +272,7 @@ public class PlatingBlock extends BaseEntityBlock {
             //Convert ID to Direction
             Direction direction = Direction.from3DDataValue(directionId);
             //If the plate has this direction
-            if (blockState.getValue(PlatingBlock.directionToProperty(direction))) {
+            if (hasDir(blockState, direction)) {
                 list.add(direction);
             }
         }
@@ -279,8 +287,8 @@ public class PlatingBlock extends BaseEntityBlock {
         double maxX = blockPos.getX() + 1 + expand;
         double maxY = blockPos.getY() + 1 + expand;
         double maxZ = blockPos.getZ() + 1 + expand;
-        //Extend area of effect a bit so the player can jump without falling off
-        double delta = GRAVITY_EFFECT_HEIGHT - 1.0;
+        
+        double delta = gravityEffectHeight - 1;
         switch (direction) {
             case DOWN -> maxY += delta;
             case UP -> minY -= delta;
@@ -290,5 +298,13 @@ public class PlatingBlock extends BaseEntityBlock {
             case EAST -> minX -= delta;
         }
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+    
+    public AABB getRoughEffectBox(BlockPos blockPos) {
+        double effectHeight = this.gravityEffectHeight;
+        return new AABB(
+            blockPos.getX() - effectHeight, blockPos.getY() - effectHeight, blockPos.getZ() - effectHeight,
+            blockPos.getX() + 1 + effectHeight, blockPos.getY() + 1 + effectHeight, blockPos.getZ() + 1 + effectHeight
+        );
     }
 }

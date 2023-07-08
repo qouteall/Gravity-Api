@@ -2,28 +2,35 @@ package gravity_changer.api;
 
 import gravity_changer.GravityChangerMod;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import gravity_changer.config.GravityChangerConfig;
 import net.minecraft.nbt.CompoundTag;
 
+// TODO refactor
 public record RotationParameters(
     boolean rotateVelocity,
     boolean rotateView,
-    boolean alternateCenter,
     int rotationTimeMS
 ) {
-    public static RotationParameters getDefault() {
-        return new RotationParameters(
-            GravityChangerMod.config.worldVelocity,
-            !GravityChangerMod.config.keepWorldLook,
-            false,
-            GravityChangerMod.config.rotationTime
+    public static RotationParameters defaultParam = new RotationParameters(
+        true, true, 500
+    );
+    
+    public static void updateDefault() {
+        defaultParam = new RotationParameters(
+            !GravityChangerConfig.worldVelocity,
+            true,
+            GravityChangerConfig.rotationTime
         );
+    }
+    
+    public static RotationParameters getDefault() {
+        return defaultParam;
     }
     
     public RotationParameters withRotationTimeMs(int rotationTimeMS) {
         return new RotationParameters(
             rotateVelocity,
             rotateView,
-            alternateCenter,
             rotationTimeMS
         );
     }
@@ -32,7 +39,6 @@ public record RotationParameters(
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("RotateVelocity", rotateVelocity);
         tag.putBoolean("RotateView", rotateView);
-        tag.putBoolean("AlternateCenter", alternateCenter);
         tag.putInt("RotationTimeMS", rotationTimeMS);
         return tag;
     }
@@ -41,7 +47,6 @@ public record RotationParameters(
         return new RotationParameters(
             tag.getBoolean("RotateVelocity"),
             tag.getBoolean("RotateView"),
-            tag.getBoolean("AlternateCenter"),
             tag.getInt("RotationTimeMS")
         );
     }

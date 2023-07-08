@@ -9,6 +9,8 @@ and Fabric mod cannot depend on a Quilt mod.
 This Gravity Changer mod is not identical to Fusion's Gravity API.
 **The two mods cannot be used interchangeably.**
 
+Its gravity plating functionality is based on contents from [AmethystGravity](https://modrinth.com/mod/amethyst-gravity) by CyborgCabbage.
+
 ### Future development goal
 
 * Explore the possibility of using world-coordinate velocity instead of entity-local velocity to simplify future development. Do aggressive rewrite to MC collision code and use Lithium's collision code which is faster.

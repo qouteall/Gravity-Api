@@ -2,9 +2,7 @@ package gravity_changer;
 
 import gravity_changer.util.QuaternionUtil;
 import gravity_changer.util.RotationUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,6 +16,7 @@ public class RotationAnimation {
     private boolean inAnimation = false;
     private Quaternionf startGravityRotation;
     private Quaternionf endGravityRotation;
+    private Vec3 relativeRotationCenter = Vec3.ZERO;
     
     private long startTimeMs;
     private long endTimeMs;
@@ -25,7 +24,7 @@ public class RotationAnimation {
     public void startRotationAnimation(
         Direction newGravity, Direction prevGravity,
         long durationTimeMs, Entity entity, long timeMs,
-        boolean rotateView
+        boolean rotateView, Vec3 relativeRotationCenter
     ) {
         if (durationTimeMs == 0) {
             inAnimation = false;
@@ -34,10 +33,11 @@ public class RotationAnimation {
         
         Validate.notNull(entity);
         
-        Vec3 newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity);
+        Vec3 newLookingDirection = getNewLookingDirection(newGravity, prevGravity, entity, rotateView);
         
         Quaternionf oldViewRotation = QuaternionUtil.getViewRotation(entity.getXRot(), entity.getYRot());
         
+        update(timeMs);
         Quaternionf currentAnimatedGravityRotation = getCurrentGravityRotation(prevGravity, timeMs);
         
         // camera rotation = view rotation(pitch and yaw) * gravity rotation(animated)
@@ -68,6 +68,7 @@ public class RotationAnimation {
         // gravity rotation = (view rotation^-1) * camera rotation
         Quaternionf animationStartGravityRotation = new Quaternionf().set(newViewRotation).conjugate().mul(currentAnimatedCameraRotation);
         
+        this.relativeRotationCenter = relativeRotationCenter;
         inAnimation = true;
         startGravityRotation = animationStartGravityRotation;
         endGravityRotation = newEndGravityRotation;
@@ -76,12 +77,17 @@ public class RotationAnimation {
     }
     
     private Vec3 getNewLookingDirection(
-        Direction newGravity, Direction prevGravity, Entity player
+        Direction newGravity, Direction prevGravity, Entity player,
+        boolean rotateView
     ) {
         Vec3 oldLookingDirection = RotationUtil.vecPlayerToWorld(
             RotationUtil.rotToVec(player.getYRot(), player.getXRot()),
             prevGravity
         );
+    
+        if (!rotateView) {
+            return oldLookingDirection;
+        }
         
         if (newGravity == prevGravity.getOpposite()) {
             return oldLookingDirection.scale(-1);
@@ -98,11 +104,13 @@ public class RotationAnimation {
         return newLookingDirection;
     }
     
+    /**
+     * It returns the rotation that applies to world for rendering.
+     * To get the rotation that applies entity, conjugate it.
+     */
     public Quaternionf getCurrentGravityRotation(Direction currentGravity, long timeMs) {
         
-        if (timeMs > endTimeMs) {
-            inAnimation = false;
-        }
+        update(timeMs);
         
         if (!inAnimation) {
             return RotationUtil.getWorldRotationQuaternion(currentGravity);
@@ -114,6 +122,36 @@ public class RotationAnimation {
             startGravityRotation, endGravityRotation,
             mapProgress((float) delta)
         );
+    }
+    
+    public void update(long timeMs) {
+        if (timeMs > endTimeMs) {
+            inAnimation = false;
+        }
+    }
+    
+    /**
+     * When doing gravity flipping, the rotation center is the player bounding box center.
+     * But the player feet pos changes abruptly. So we need special calculation to eye offset.
+     *
+     * Note when rotateView is false, it will cause non-smooth eye offset change
+     */
+    public Vec3 getEyeOffset(
+        Quaternionf gravityRot, Vec3 localEyeOffset, Direction newGravity
+    ) {
+        Quaternionf gravityRotForEntity = new Quaternionf(gravityRot).conjugate();
+        
+        if (!inAnimation || relativeRotationCenter.equals(Vec3.ZERO)) {
+            return QuaternionUtil.rotate(localEyeOffset, gravityRotForEntity);
+        }
+        
+        Vec3 rotationCenterOffset = RotationUtil.vecPlayerToWorld(relativeRotationCenter, newGravity);
+        
+        Vec3 eyeOffsetFromRotationCenter = localEyeOffset.subtract(relativeRotationCenter);
+        Vec3 rotatedEyeOffsetFromRotationCenter =
+            QuaternionUtil.rotate(eyeOffsetFromRotationCenter, gravityRotForEntity);
+        
+        return rotationCenterOffset.add(rotatedEyeOffsetFromRotationCenter);
     }
     
     private static float mapProgress(float delta) {

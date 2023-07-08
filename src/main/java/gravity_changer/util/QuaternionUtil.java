@@ -24,4 +24,11 @@ public abstract class QuaternionUtil {
             (float) angle
         );
     }
+    
+    // using mutable objects could easily cause bugs if forget to copy
+    public static Vec3 rotate(Vec3 vec, Quaternionf quaternionf) {
+        Vector3f vector3f = vec.toVector3f();
+        vector3f.rotate(quaternionf);
+        return new Vec3(vector3f);
+    }
 }
