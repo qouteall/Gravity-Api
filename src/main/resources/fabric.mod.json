@@ -12,7 +12,9 @@
   "authors": [
     "Gaider10",
     "Fusion Flux",
-    "qouteall"
+    "qouteall",
+    "CyborgCabbage",
+    "other contributors (see GitHub)"
   ],
   "license": "MIT",
   "icon": "assets/gravity_changer/icon.png",
@@ -26,7 +28,7 @@
       "gravity_changer.GravityChangerMod"
     ],
     "client": [
-      "gravity_changer.ClientInit"
+      "gravity_changer.GravityChangerModClient"
     ],
     "modmenu": [
       "gravity_changer.ModMenuIntegration"

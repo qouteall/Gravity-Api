@@ -1,12 +1,15 @@
 package gravity_changer;
 
+import gravity_changer.gravity_plate.PlatingBlock;
 import gravity_changer.util.GCUtil;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 
-public class ClientInit implements ClientModInitializer {
+public class GravityChangerModClient implements ClientModInitializer {
     private static final String ISSUE_LINK = "https://github.com/qouteall/GravityChanger/issues";
     private static boolean displayPreviewWarning = true;
     
@@ -28,5 +31,9 @@ public class ClientInit implements ClientModInitializer {
                 }
             }
         });
+        
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), PlatingBlock.PLATING_BLOCK);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), PlatingBlock.DENSE_PLATING_BLOCK);
+        
     }
 }

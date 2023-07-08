@@ -2,27 +2,21 @@ package gravity_changer;
 
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
-import gravity_changer.effect.GravityDirectionEffect;
-import gravity_changer.effect.GravityInvertEffect;
+import gravity_changer.gravity_plate.PlatingBlock;
+import gravity_changer.gravity_plate.PlatingBlockEntity;
+import gravity_changer.mob_effect.GravityDirectionMobEffect;
+import gravity_changer.mob_effect.GravityInvertMobEffect;
 import gravity_changer.item.ModItems;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
@@ -74,8 +68,12 @@ public class GravityChangerMod implements ModInitializer {
             GravityChangerGroup
         );
         
-        GravityDirectionEffect.init();
-        GravityInvertEffect.init();
+        GravityDirectionMobEffect.init();
+        GravityInvertMobEffect.init();
+        GravityField.init();
+        
+        PlatingBlock.init();
+        PlatingBlockEntity.init();
     }
     
     public static ResourceLocation id(String path) {

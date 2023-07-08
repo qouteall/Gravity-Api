@@ -6,7 +6,6 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
-import gravity_changer.effect.GravityDirectionEffect;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,11 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.AABB;
@@ -31,6 +28,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class GravityComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
     
@@ -95,6 +95,11 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     public final Entity entity;
     
+    // there is no guarantee of entity ticking order
+    // if the gravity source is an entity, it could tick before or after target entity
+    private int gravityEffectUpdateTickCount = 0;
+    private final ArrayList<GravityEffect> gravityEffects = new ArrayList<>();
+    
     public GravityComponent(Entity entity) {
         this.entity = entity;
         if (entity.level().isClientSide()) {
@@ -145,18 +150,47 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
         
         if (!entity.level().isClientSide()) {
-            // update effective gravity direction and strength
-            currGravityDirection = getEffectiveGravityDirection();
-            currGravityStrength = getEffectiveGravityStrength();
+            updateEffectiveGravityState();
             
-            refreshGravityDirection();
-            refreshGravityStrength();
+            refreshGravityState();
             
             if (needsSync) {
                 needsSync = false;
                 GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
             }
         }
+        
+        int tickCount = entity.tickCount;
+        if (Math.abs(tickCount - gravityEffectUpdateTickCount) >= 2) {
+            gravityEffectUpdateTickCount = tickCount;
+            gravityEffects.clear();
+        }
+    }
+    
+    private void updateEffectiveGravityState() {
+        GravityEffect effectiveGravityEffect = getEffectiveGravityEffect();
+        
+        Entity vehicle = entity.getVehicle();
+        if (vehicle != null) {
+            currGravityDirection = GravityChangerAPI.getGravityDirection(vehicle);
+        }
+        else {
+            if (effectiveGravityEffect != null && effectiveGravityEffect.direction() != null) {
+                currGravityDirection = effectiveGravityEffect.direction();
+            }
+            else {
+                currGravityDirection = GRAVITY_DIR_MODIFIER_EVENT.invoker().transform(
+                    this, baseGravityDirection
+                );
+            }
+        }
+        
+        // TODO handle strength effects
+        
+        double effectGravityStrength = effectiveGravityEffect == null ? 1.0 : effectiveGravityEffect.strengthMultiplier();
+        currGravityStrength = baseGravityStrength *
+            GravityChangerAPI.getDimensionGravityStrength(entity.level()) *
+            effectGravityStrength;
     }
     
     @Override
@@ -166,43 +200,9 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         if (entity.level().isClientSide()) {
             // the packet should be handled on client thread
             // start the gravity animation (doing that during ticking is too late)
-            refreshGravityDirection();
-            refreshGravityStrength();
+            refreshGravityState();
             needsSync = false;
         }
-    }
-    
-    private void refreshGravityDirection() {
-        if (prevGravityDirection != currGravityDirection) {
-            applyGravityDirectionChange(prevGravityDirection, currGravityDirection, currentRotationParameters, false);
-            prevGravityDirection = currGravityDirection;
-            needsSync = true;
-        }
-    }
-    
-    private void refreshGravityStrength() {
-        if (Math.abs(currGravityStrength - prevGravityStrength) > 0.0001) {
-            prevGravityStrength = currGravityStrength;
-            needsSync = true;
-        }
-    }
-    
-    private Direction getEffectiveGravityDirection() {
-        Entity vehicle = entity.getVehicle();
-        if (vehicle != null) {
-            return GravityChangerAPI.getGravityDirection(vehicle);
-        }
-    
-        Direction result = GRAVITY_DIR_MODIFIER_EVENT.invoker().transform(
-            this, baseGravityDirection
-        );
-        return result;
-    }
-    
-    private double getEffectiveGravityStrength() {
-        // TODO handle effects
-        
-        return baseGravityStrength * GravityChangerAPI.getDimensionGravityStrength(entity.level());
     }
     
     public void applyGravityDirectionChange(
@@ -403,5 +403,55 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     @Environment(EnvType.CLIENT)
     public RotationAnimation getRotationAnimation() {
         return animation;
+    }
+    
+    /**
+     * When the gravity direction updates on client,
+     * to avoid client-server synchronization delay and immediately change gravity on client,
+     * call this.
+     */
+    public void refreshGravityState() {
+        if (prevGravityDirection != currGravityDirection) {
+            applyGravityDirectionChange(prevGravityDirection, currGravityDirection, currentRotationParameters, false);
+            prevGravityDirection = currGravityDirection;
+            needsSync = true;
+        }
+        
+        if (Math.abs(currGravityStrength - prevGravityStrength) > 0.0001) {
+            prevGravityStrength = currGravityStrength;
+            needsSync = true;
+        }
+    }
+    
+    private static final int MAX_GRAVITY_EFFECT_NUM = 8;
+    
+    // needs to apply every tick
+    public void applyGravityEffect(GravityEffect effect) {
+        int tickCount = entity.tickCount;
+        if (tickCount != gravityEffectUpdateTickCount) {
+            gravityEffectUpdateTickCount = tickCount;
+            gravityEffects.clear();
+        }
+        
+        if (gravityEffects.size() >= MAX_GRAVITY_EFFECT_NUM) {
+            return;
+        }
+        
+        gravityEffects.add(effect);
+    }
+    
+    @Nullable
+    public GravityEffect getEffectiveGravityEffect() {
+        Vec3 position = entity.position();
+        
+        Comparator<GravityEffect> comparator = Comparator.comparingDouble(
+            GravityEffect::priority
+        ).thenComparing(
+            Comparator.comparingDouble(
+                e -> -e.sourcePos().distanceToSqr(position)
+            )
+        );
+        
+        return gravityEffects.stream().max(comparator).orElse(null);
     }
 }

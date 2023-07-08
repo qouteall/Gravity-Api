@@ -1,4 +1,4 @@
-package gravity_changer.effect;
+package gravity_changer.mob_effect;
 
 import gravity_changer.GravityComponent;
 import net.minecraft.core.Direction;
@@ -10,23 +10,22 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 
-public class GravityDirectionEffect extends MobEffect {
+public class GravityDirectionMobEffect extends MobEffect {
     public static final int COLOR = 0x98D982;
     
-    public static final ResourceLocation PHASE = new ResourceLocation("gravity_changer:dir_effect_phase");
+    public static final ResourceLocation PHASE = new ResourceLocation("gravity_changer:dir_mob_effect_phase");
     
     public final Direction gravityDirection;
     
-    public GravityDirectionEffect(Direction gravityDirection) {
+    public GravityDirectionMobEffect(Direction gravityDirection) {
         super(MobEffectCategory.NEUTRAL, COLOR);
         this.gravityDirection = gravityDirection;
     }
     
-    public static final EnumMap<Direction, GravityDirectionEffect> EFFECT_MAP =
+    public static final EnumMap<Direction, GravityDirectionMobEffect> EFFECT_MAP =
         new EnumMap<>(Direction.class);
     
     public static ResourceLocation getEffectId(Direction direction) {
@@ -42,7 +41,7 @@ public class GravityDirectionEffect extends MobEffect {
     
     public static void init() {
         for (Direction dir : Direction.values()) {
-            GravityDirectionEffect effect = new GravityDirectionEffect(dir);
+            GravityDirectionMobEffect effect = new GravityDirectionMobEffect(dir);
             EFFECT_MAP.put(dir, effect);
     
             Registry.register(
@@ -60,7 +59,7 @@ public class GravityDirectionEffect extends MobEffect {
                 
                 Direction curr = direction;
                 int maxAmplifier = 0;
-                for (GravityDirectionEffect dirEffect : GravityDirectionEffect.EFFECT_MAP.values()) {
+                for (GravityDirectionMobEffect dirEffect : GravityDirectionMobEffect.EFFECT_MAP.values()) {
                     MobEffectInstance effectInstance = livingEntity.getEffect(dirEffect);
                     if (effectInstance != null) {
                         int amplifier = effectInstance.getAmplifier();
