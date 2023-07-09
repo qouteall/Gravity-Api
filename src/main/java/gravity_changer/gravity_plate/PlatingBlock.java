@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -64,7 +65,7 @@ public class PlatingBlock extends BaseEntityBlock {
     public final double gravityEffectHeight;
     
     public static final Block PLATING_BLOCK = new PlatingBlock(
-        0.6, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
+        0.9, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
     );
     public static final Block DENSE_PLATING_BLOCK = new PlatingBlock(
         2.0, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
@@ -279,8 +280,9 @@ public class PlatingBlock extends BaseEntityBlock {
         return list;
     }
     
-    public AABB getGravityEffectBox(BlockPos blockPos, Direction direction) {
+    public AABB getGravityEffectBox(Level world, BlockPos blockPos, Direction plateDir) {
         double expand = 0.001;
+        
         double minX = blockPos.getX() - expand;
         double minY = blockPos.getY() - expand;
         double minZ = blockPos.getZ() - expand;
@@ -289,7 +291,7 @@ public class PlatingBlock extends BaseEntityBlock {
         double maxZ = blockPos.getZ() + 1 + expand;
         
         double delta = gravityEffectHeight - 1;
-        switch (direction) {
+        switch (plateDir) {
             case DOWN -> maxY += delta;
             case UP -> minY -= delta;
             case NORTH -> maxZ += delta;
@@ -297,14 +299,37 @@ public class PlatingBlock extends BaseEntityBlock {
             case WEST -> maxX += delta;
             case EAST -> minX -= delta;
         }
+        
+        BlockPos wallPos = blockPos.relative(plateDir);
+        for (Direction sideDir : Direction.values()) {
+            if (sideDir.getAxis() != plateDir.getAxis()) {
+                BlockPos sidePos = wallPos.relative(sideDir);
+                BlockState sideBlockState = world.getBlockState(sidePos);
+                if (sideBlockState.getBlock() instanceof PlatingBlock sidePlatingBlock) {
+                    if (hasDir(sideBlockState, sideDir.getOpposite())) {
+                        double sideDelta = sidePlatingBlock.gravityEffectHeight;
+                        switch (sideDir) {
+                            case DOWN -> minY -= sideDelta;
+                            case UP -> maxY += sideDelta;
+                            case NORTH -> minZ -= sideDelta;
+                            case SOUTH -> maxZ += sideDelta;
+                            case WEST -> minX -= sideDelta;
+                            case EAST -> maxX += sideDelta;
+                        }
+                    }
+                }
+            }
+        }
+        
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
     
     public AABB getRoughEffectBox(BlockPos blockPos) {
-        double effectHeight = this.gravityEffectHeight;
+        double expand = 0.001;
+        double delta = this.gravityEffectHeight + expand;
         return new AABB(
-            blockPos.getX() - effectHeight, blockPos.getY() - effectHeight, blockPos.getZ() - effectHeight,
-            blockPos.getX() + 1 + effectHeight, blockPos.getY() + 1 + effectHeight, blockPos.getZ() + 1 + effectHeight
+            blockPos.getX() - delta, blockPos.getY() - delta, blockPos.getZ() - delta,
+            blockPos.getX() + 1 + delta, blockPos.getY() + 1 + delta, blockPos.getZ() + 1 + delta
         );
     }
 }

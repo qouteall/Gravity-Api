@@ -32,7 +32,7 @@ public class GravityChangerComponents implements EntityComponentInitializer, Wor
             new RespawnCopyStrategy<GravityComponent>() {
                 @Override
                 public void copyForRespawn(GravityComponent from, GravityComponent to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
-                    if (lossless || !GravityChangerConfig.resetGravityOnRespawn) {
+                    if (lossless || !GravityChangerMod.config.resetGravityOnRespawn) {
                         RespawnCopyStrategy.copy(from, to);
                     }
                 }

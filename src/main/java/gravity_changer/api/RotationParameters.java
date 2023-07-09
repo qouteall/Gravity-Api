@@ -1,11 +1,9 @@
 package gravity_changer.api;
 
 import gravity_changer.GravityChangerMod;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import gravity_changer.config.GravityChangerConfig;
 import net.minecraft.nbt.CompoundTag;
 
-// TODO refactor
 public record RotationParameters(
     boolean rotateVelocity,
     boolean rotateView,
@@ -17,9 +15,9 @@ public record RotationParameters(
     
     public static void updateDefault() {
         defaultParam = new RotationParameters(
-            !GravityChangerConfig.worldVelocity,
+            !GravityChangerMod.config.worldVelocity,
             true,
-            GravityChangerConfig.rotationTime
+            GravityChangerMod.config.rotationTime
         );
     }
     

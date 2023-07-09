@@ -636,7 +636,7 @@ public abstract class EntityMixin {
     private void inject_attemptTickInVoid(CallbackInfo ci) {
         Entity this_ = (Entity) (Object) this;
         
-        if (GravityChangerConfig.voidDamageAboveWorld &&
+        if (GravityChangerMod.config.voidDamageAboveWorld &&
             this.getY() > (double) (this.level.getMaxBuildHeight() + 256)
         ) {
             this.onBelowWorld();
@@ -644,7 +644,7 @@ public abstract class EntityMixin {
             return;
         }
         
-        if (GravityChangerConfig.voidDamageOnHorizontalFallTooFar &&
+        if (GravityChangerMod.config.voidDamageOnHorizontalFallTooFar &&
             GravityChangerAPI.getGravityDirection(this_).getAxis() != Direction.Axis.Y &&
             fallDistance > 1024
         ) {
