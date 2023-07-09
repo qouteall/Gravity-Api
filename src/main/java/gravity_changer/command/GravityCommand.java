@@ -30,7 +30,7 @@ public class GravityCommand {
                         Collection<? extends Entity> entities = EntityArgument.getEntities(context, "entities");
                         Direction direction = DirectionArgumentType.getDirection(context, "direction");
                         for (Entity entity : entities) {
-                            GravityChangerAPI.setBaseGravityDirection(entity, direction, RotationParameters.getDefault());
+                            GravityChangerAPI.setBaseGravityDirection(entity, direction);
                         }
                         return entities.size();
                     })
@@ -72,7 +72,7 @@ public class GravityCommand {
                     Collection<? extends Entity> entities = EntityArgument.getEntities(context, "entities");
                     for (Entity entity : entities) {
                         Direction gravityDirection = Direction.getRandom(random);
-                        GravityChangerAPI.setBaseGravityDirection(entity, gravityDirection, RotationParameters.getDefault());
+                        GravityChangerAPI.setBaseGravityDirection(entity, gravityDirection);
                     }
                     return entities.size();
                 })
@@ -117,7 +117,7 @@ public class GravityCommand {
                     Direction.from2DDataValue(relativeDirection.getHorizontalOffset() + Direction.fromYRot(entity.getYRot()).get2DDataValue());
             };
             Direction newGravityDirection = RotationUtil.dirPlayerToWorld(combinedRelativeDirection, gravityDirection);
-            GravityChangerAPI.setBaseGravityDirection(entity, newGravityDirection, RotationParameters.getDefault());
+            GravityChangerAPI.setBaseGravityDirection(entity, newGravityDirection);
             //GravityChangerAPI.updateGravity(entity);
             getSendFeedback(source, entity, newGravityDirection);
             i++;

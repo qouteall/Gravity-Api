@@ -13,6 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityChangerAPI {
@@ -67,16 +68,30 @@ public abstract class GravityChangerAPI {
     }
     
     public static void setBaseGravityDirection(
-        Entity entity, Direction gravityDirection, RotationParameters rotationParameters
+        Entity entity, Direction gravityDirection
     ) {
         GravityComponent component = getGravityComponent(entity);
-        component.setBaseGravityDirection(gravityDirection, rotationParameters, false);
+        component.setBaseGravityDirection(gravityDirection);
     }
     
     @Nullable
     @Environment(EnvType.CLIENT)
     public static RotationAnimation getRotationAnimation(Entity entity) {
         return getGravityComponent(entity).getRotationAnimation();
+    }
+    
+    public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
+        Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
+        
+        GravityComponent component = getGravityComponent(entity);
+        
+        component.setBaseGravityDirection(direction);
+    
+        component.updateGravityModification(false);
+        
+        component.updateCurrentGravityBasedOnModifiedGravity();
+    
+        component.applyGravityChange(RotationParameters.getDefault().withRotationTimeMs(0));
     }
     
     public static GravityComponent getGravityComponent(Entity entity) {

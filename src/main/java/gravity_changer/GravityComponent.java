@@ -53,7 +53,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     /**
      * Modify the gravity direction in this event.
      * This event is mostly called on server side.
-     * It can be called on client when {@link GravityComponent#updateGravityModification()} is called on client
+     * It can be called on client when {@link GravityComponent#updateGravityModification(boolean)} is called on client
      */
     public static final Event<GravityDirModifierCallback> GRAVITY_DIR_MODIFIER_EVENT =
         EventFactory.createArrayBacked(
@@ -204,16 +204,16 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             }
             
             if (!entity.level().isClientSide()) {
-                updateGravityModification();
+                updateGravityModification(true);
                 
                 updateCurrentGravityBasedOnModifiedGravity();
                 
-                applyGravityChange();
+                applyGravityChange(currentTickRotationParameters == null ? RotationParameters.getDefault() : currentTickRotationParameters);
             }
             else {
                 updateCurrentGravityBasedOnModifiedGravity();
                 
-                applyGravityChange();
+                applyGravityChange(currentTickRotationParameters == null ? RotationParameters.getDefault() : currentTickRotationParameters);
             }
         }
         
@@ -239,7 +239,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
     }
     
-    public void updateGravityModification() {
+    public void updateGravityModification(boolean doSync) {
         Direction oldModifiedGravityDirection = modifiedGravityDirection;
         modifiedGravityDirection = GRAVITY_DIR_MODIFIER_EVENT.invoker().transform(
             this, baseGravityDirection
@@ -255,11 +255,13 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             this, strength
         );
         
-        boolean needsSync = (modifiedGravityDirection != oldModifiedGravityDirection)
-            || Math.abs(modifiedGravityStrength - oldModifiedGravityStrength) > 1e-6;
-        
-        if (needsSync) {
-            GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+        if (doSync) {
+            boolean needsSync = (modifiedGravityDirection != oldModifiedGravityDirection)
+                || Math.abs(modifiedGravityStrength - oldModifiedGravityStrength) > 1e-6;
+            
+            if (needsSync) {
+                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+            }
         }
     }
     
@@ -272,7 +274,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             // start the gravity animation (doing that during ticking is too late)
             updateCurrentGravityBasedOnModifiedGravity();
             
-            applyGravityChange();
+            applyGravityChange(currentTickRotationParameters == null ? RotationParameters.getDefault() : currentTickRotationParameters);
         }
     }
     
@@ -468,7 +470,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         return baseGravityDirection;
     }
     
-    public void setBaseGravityDirection(Direction gravityDirection, RotationParameters rotationParameters, boolean initialGravity) {
+    public void setBaseGravityDirection(Direction gravityDirection) {
         if (!canChangeGravity()) {
             return;
         }
@@ -486,10 +488,8 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         return animation;
     }
     
-    public void applyGravityChange() {
+    public void applyGravityChange(RotationParameters rotationParameters) {
         if (prevGravityDirection != currGravityDirection) {
-            RotationParameters rotationParameters =
-                currentTickRotationParameters == null ? RotationParameters.getDefault() : currentTickRotationParameters;
             applyGravityDirectionChange(
                 prevGravityDirection, currGravityDirection,
                 rotationParameters, false
@@ -528,7 +528,6 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     @Nullable
     public GravityEffect getCurrentGravityEffect() {
-//        return null;
         return currentGravityEffect;
     }
     

@@ -8,7 +8,7 @@ targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = "${project.mod_version}-mc${project.minecraft_version}"
-group = "Gaider10"
+group = "qouteall"
 
 repositories {
 	maven {
@@ -105,6 +105,14 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+		maven {
+			name = "GitHubPackages"
+			url = "https://maven.pkg.github.com/octocat/hello-world"
+			credentials {
+				username = System.getenv("GITHUB_ACTOR")
+				password = System.getenv("GITHUB_TOKEN")
+			}
+		}
 	}
 }
 

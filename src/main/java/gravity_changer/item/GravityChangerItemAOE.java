@@ -40,7 +40,7 @@ public class GravityChangerItemAOE extends Item {
             AABB box = user.getBoundingBox().inflate(3);
             List<Entity> list = world.getEntitiesOfClass(Entity.class, box, e -> !(e instanceof Player));
             for (Entity entity : list) {
-                GravityChangerAPI.setBaseGravityDirection(entity, gravityDirection, RotationParameters.getDefault());
+                GravityChangerAPI.setBaseGravityDirection(entity, gravityDirection);
             }
         }
         return InteractionResultHolder.success(user.getItemInHand(hand));
