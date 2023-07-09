@@ -50,6 +50,11 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     private static final Logger LOGGER = LogUtils.getLogger();
     
+    /**
+     * Modify the gravity direction in this event.
+     * This event is mostly called on server side.
+     * It can be called on client when {@link GravityComponent#updateGravityModification()} is called on client
+     */
     public static final Event<GravityDirModifierCallback> GRAVITY_DIR_MODIFIER_EVENT =
         EventFactory.createArrayBacked(
             GravityDirModifierCallback.class,
@@ -156,7 +161,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
         
         if (!initialized) {
-            updateCurrentGravityState();
+            updateCurrentGravityBasedOnModifiedGravity();
             prevGravityDirection = currGravityDirection;
             prevGravityStrength = currGravityStrength;
             initialized = true;
@@ -201,10 +206,14 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             if (!entity.level().isClientSide()) {
                 updateGravityModification();
                 
-                refreshGravityState();
+                updateCurrentGravityBasedOnModifiedGravity();
+                
+                applyGravityChange();
             }
             else {
-                refreshGravityState();
+                updateCurrentGravityBasedOnModifiedGravity();
+                
+                applyGravityChange();
             }
         }
         
@@ -212,7 +221,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         currentTickRotationParameters = null;
     }
     
-    private void updateCurrentGravityState() {
+    public void updateCurrentGravityBasedOnModifiedGravity() {
         Validate.isTrue(modifiedGravityDirection != null);
         GravityEffect effect = getCurrentGravityEffect();
         if (effect != null) {
@@ -230,7 +239,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
     }
     
-    private void updateGravityModification() {
+    public void updateGravityModification() {
         Direction oldModifiedGravityDirection = modifiedGravityDirection;
         modifiedGravityDirection = GRAVITY_DIR_MODIFIER_EVENT.invoker().transform(
             this, baseGravityDirection
@@ -261,7 +270,9 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         if (entity.level().isClientSide()) {
             // the packet should be handled on client thread
             // start the gravity animation (doing that during ticking is too late)
-            refreshGravityState();
+            updateCurrentGravityBasedOnModifiedGravity();
+            
+            applyGravityChange();
         }
     }
     
@@ -475,14 +486,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         return animation;
     }
     
-    /**
-     * When the gravity direction updates on client,
-     * to avoid client-server synchronization delay and immediately change gravity on client,
-     * call this.
-     */
-    public void refreshGravityState() {
-        updateCurrentGravityState();
-        
+    public void applyGravityChange() {
         if (prevGravityDirection != currGravityDirection) {
             RotationParameters rotationParameters =
                 currentTickRotationParameters == null ? RotationParameters.getDefault() : currentTickRotationParameters;
