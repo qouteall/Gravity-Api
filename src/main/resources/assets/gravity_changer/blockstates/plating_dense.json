@@ -5,7 +5,7 @@
             "down": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "uvlock": true
           }
         },
@@ -14,7 +14,7 @@
             "up": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "x": 180,
             "uvlock": true
           }
@@ -24,7 +24,7 @@
             "south": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "x": 90,
             "uvlock": true
           }
@@ -34,7 +34,7 @@
             "west": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "x": 90,
             "y": 90,
             "uvlock": true
@@ -45,7 +45,7 @@
             "north": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "x": 90,
             "y": 180,
             "uvlock": true
@@ -56,7 +56,7 @@
             "east": "true"
           },
           "apply": {
-            "model": "gravity_changer:block/dense_plating",
+            "model": "gravity_changer:block/plating_dense",
             "x": 90,
             "y": 270,
             "uvlock": true

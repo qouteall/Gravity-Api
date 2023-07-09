@@ -32,8 +32,8 @@ import org.slf4j.Logger;
 /**
  * The gravity is determined by the follows:
  * 1. base gravity
- * 2. gravity modifier (determined from modifier events)
- * 3. gravity effects
+ * 2. gravity modifier, can override base gravity (determined from modifier events)
+ * 3. gravity effects, can override modified gravity
  * The result of applying 1 and 2 is called modified gravity and is synced.
  * The result of 3 is current gravity and is not synced.
  * The gravity effect should be applied both on client and server.

@@ -13,6 +13,33 @@
   "item.gravity_changer.gravity_changer_west_aoe": "West Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_east_aoe": "East Gravity Changer AOE",
 
+  "item.minecraft.potion.effect.gravity_decr_0": "Potion of Gravity Decrease",
+  "item.minecraft.potion.effect.gravity_decr_1": "Potion of Gravity Decrease",
+  "item.minecraft.potion.effect.gravity_incr": "Potion of Gravity Increase",
+  "item.minecraft.potion.effect.gravity_incr_1": "Potion of Gravity Increase",
+
+  "item.minecraft.splash_potion.effect.gravity_decr_0": "Splash Potion of Gravity Decrease",
+  "item.minecraft.splash_potion.effect.gravity_decr_1": "Splash Potion of Gravity Decrease",
+  "item.minecraft.splash_potion.effect.gravity_incr": "Splash Potion of Gravity Increase",
+  "item.minecraft.splash_potion.effect.gravity_incr_1": "Splash Potion of Gravity Increase",
+
+  "item.minecraft.lingering_potion.effect.gravity_decr_0": "Lingering Potion of Gravity Decrease",
+  "item.minecraft.lingering_potion.effect.gravity_decr_1": "Lingering Potion of Gravity Decrease",
+  "item.minecraft.lingering_potion.effect.gravity_incr": "Lingering Potion of Gravity Increase",
+  "item.minecraft.lingering_potion.effect.gravity_incr_1": "Lingering Potion of Gravity Increase",
+
+  "effect.gravity_changer.strength_increase": "Gravity Increase",
+  "effect.gravity_changer.strength_decrease": "Gravity Decrease",
+  "effect.gravity_changer.down": "Down Gravity",
+  "effect.gravity_changer.up": "Up Gravity",
+  "effect.gravity_changer.north": "North Gravity",
+  "effect.gravity_changer.south": "South Gravity",
+  "effect.gravity_changer.west": "West Gravity",
+  "effect.gravity_changer.east": "East Gravity",
+
+  "block.gravity_changer.plating": "Gravity Plating",
+  "block.gravity_changer.plating_dense": "Dense Gravity Plating",
+
   "itemGroup.gravity_changer.general": "Gravity Changer",
 
   "gravity_changer.preview": "You are using the preview version of gravity changer. Report issues: ",

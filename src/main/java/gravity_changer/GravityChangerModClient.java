@@ -1,6 +1,6 @@
 package gravity_changer;
 
-import gravity_changer.gravity_plate.PlatingBlock;
+import gravity_changer.plating.PlatingBlock;
 import gravity_changer.util.GCUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;

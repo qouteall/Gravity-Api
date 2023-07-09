@@ -3,8 +3,10 @@ package gravity_changer;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
-import gravity_changer.gravity_plate.PlatingBlock;
-import gravity_changer.gravity_plate.PlatingBlockEntity;
+import gravity_changer.mob_effect.GravityPotion;
+import gravity_changer.mob_effect.GravityStrengthMobEffect;
+import gravity_changer.plating.PlatingBlock;
+import gravity_changer.plating.PlatingBlockEntity;
 import gravity_changer.item.GravityChangerItem;
 import gravity_changer.item.GravityChangerItemAOE;
 import gravity_changer.mob_effect.GravityDirectionMobEffect;
@@ -13,7 +15,6 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.event.ConfigSerializeEvent;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -86,7 +87,8 @@ public class GravityChangerMod implements ModInitializer {
         
         GravityDirectionMobEffect.init();
         GravityInvertMobEffect.init();
-        GravityField.init();
+        GravityStrengthMobEffect.init();
+        GravityPotion.init();
         
         PlatingBlock.init();
         PlatingBlockEntity.init();

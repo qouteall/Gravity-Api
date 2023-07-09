@@ -58,7 +58,7 @@ public class GravityDirectionMobEffect extends MobEffect {
                 }
                 
                 Direction curr = direction;
-                int maxAmplifier = 0;
+                int maxAmplifier = -1;
                 for (GravityDirectionMobEffect dirEffect : GravityDirectionMobEffect.EFFECT_MAP.values()) {
                     MobEffectInstance effectInstance = livingEntity.getEffect(dirEffect);
                     if (effectInstance != null) {

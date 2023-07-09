@@ -1,0 +1,27 @@
+name: Issue Report
+description: File an issue report
+body:
+  - type: dropdown
+    id: mc_version
+    attributes:
+      label: Minecraft version
+      options:
+        - "Select One"
+        - "1.20.1"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the issue
+      description: Describe the issue. Drag the log and crash report to here. The log is `latest.log` in `logs` folder in the game directory. The log provides useful information (including the mod list) for debugging the issue.
+      value: "Describe the issue."
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: "### The maintainer may ask questions for clarifying this issue. Simply submitting a vague issue without replying will get ignored."
+  - type: markdown
+    attributes:
+      value: "### Be polite to the maintainer. Impolite issues will be directly closed."

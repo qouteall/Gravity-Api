@@ -1,4 +1,4 @@
-package gravity_changer.gravity_plate;
+package gravity_changer.plating;
 
 import java.util.List;
 

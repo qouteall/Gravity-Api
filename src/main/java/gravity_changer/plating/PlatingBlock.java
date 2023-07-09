@@ -1,4 +1,4 @@
-package gravity_changer.gravity_plate;
+package gravity_changer.plating;
 
 import com.google.common.collect.ImmutableMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -82,16 +81,16 @@ public class PlatingBlock extends BaseEntityBlock {
             BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:plating"), PLATING_BLOCK_ITEM
         );
         Registry.register(
-            BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:dense_plating"), DENSE_PLATING_BLOCK
+            BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:plating_dense"), DENSE_PLATING_BLOCK
         );
         Registry.register(
-            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:dense_plating"), DENSE_PLATING_BLOCK_ITEM
+            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:plating_dense"), DENSE_PLATING_BLOCK_ITEM
         );
     }
     
-    public PlatingBlock(double height, Properties settings) {
+    public PlatingBlock(double effectHeight, Properties settings) {
         super(settings);
-        gravityEffectHeight = height;
+        gravityEffectHeight = effectHeight;
         registerDefaultState(getStateDefinition().any()
             .setValue(NORTH, false)
             .setValue(EAST, false)
