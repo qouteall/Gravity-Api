@@ -6,7 +6,6 @@ import com.mojang.logging.LogUtils;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerMod;
 import gravity_changer.GravityComponent;
-import gravity_changer.GravityEffect;
 import gravity_changer.api.GravityChangerAPI;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
@@ -96,10 +95,9 @@ public class PlatingBlockEntity extends BlockEntity {
                         // reduce the chance of opposite side plating interference
                         priority -= 3;
                     }
-                    GravityEffect gravityEffect = new GravityEffect(
-                        plateDir, 1, priority, effectCenter, world.dimension()
+                    comp.applyGravityDirectionEffect(
+                        plateDir, null, priority
                     );
-                    comp.applyGravityEffect(gravityEffect);
                     applies = true;
                 }
             }

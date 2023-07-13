@@ -87,11 +87,9 @@ public abstract class GravityChangerAPI {
         
         component.setBaseGravityDirection(direction);
     
-        component.updateGravityModification(false);
+        component.updateGravityStatus();
         
-        component.updateCurrentGravityBasedOnModifiedGravity();
-    
-        component.applyGravityChange(RotationParameters.getDefault().withRotationTimeMs(0));
+        component.forceApplyGravityChange();
     }
     
     public static GravityComponent getGravityComponent(Entity entity) {

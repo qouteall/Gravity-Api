@@ -6,7 +6,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
 public class GravityInvertMobEffect extends MobEffect {
@@ -24,22 +23,21 @@ public class GravityInvertMobEffect extends MobEffect {
     }
     
     public static void init() {
-        GravityComponent.GRAVITY_DIR_MODIFIER_EVENT.register(
-            PHASE, (component, direction) -> {
-                Entity entity = component.entity;
-                
+        GravityComponent.GRAVITY_UPDATE_EVENT.register(
+            PHASE, (entity, component) -> {
                 if (entity instanceof LivingEntity livingEntity) {
                     if (livingEntity.hasEffect(INSTANCE)) {
-                        return direction.getOpposite();
+                        component.applyGravityDirectionEffect(
+                            component.getCurrGravityDirection().getOpposite(),
+                            null, 5
+                        );
                     }
                 }
-                
-                return direction;
             }
         );
         
         // apply invert after gravity effect
-        GravityComponent.GRAVITY_STRENGTH_MODIFIER_EVENT.addPhaseOrdering(
+        GravityComponent.GRAVITY_UPDATE_EVENT.addPhaseOrdering(
             GravityDirectionMobEffect.PHASE, GravityInvertMobEffect.PHASE
         );
         

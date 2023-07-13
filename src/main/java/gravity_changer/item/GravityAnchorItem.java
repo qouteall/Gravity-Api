@@ -1,5 +1,6 @@
 package gravity_changer.item;
 
+import gravity_changer.GravityComponent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -33,8 +34,18 @@ public class GravityAnchorItem extends Item {
                 BuiltInRegistries.ITEM, getItemId(direction), ITEM_MAP.get(direction)
             );
         }
-    
         
+        GravityComponent.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
+            for (ItemStack handSlot : entity.getHandSlots()) {
+                Item item = handSlot.getItem();
+                if (item instanceof GravityAnchorItem anchorItem) {
+                    component.applyGravityDirectionEffect(
+                        anchorItem.direction,
+                        null, 1000000
+                    );
+                }
+            }
+        });
     }
     
     public static ResourceLocation getItemId(Direction direction) {

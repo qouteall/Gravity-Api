@@ -5,6 +5,7 @@ import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -48,8 +49,14 @@ public class GravityChangerItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
         super.appendHoverText(stack, world, tooltip, context);
-        tooltip.add(Component.translatable("gravity_changer.gravity_changer.tooltip.0"));
-        tooltip.add(Component.translatable("gravity_changer.gravity_changer.tooltip.1"));
+        tooltip.add(
+            Component.translatable("gravity_changer.gravity_changer.tooltip.0")
+                .withStyle(ChatFormatting.GRAY)
+        );
+        tooltip.add(
+            Component.translatable("gravity_changer.gravity_changer.tooltip.1")
+                .withStyle(ChatFormatting.GRAY)
+        );
     }
     
     public static void init() {

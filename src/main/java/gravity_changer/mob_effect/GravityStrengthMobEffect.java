@@ -33,32 +33,27 @@ public class GravityStrengthMobEffect extends MobEffect {
         return Math.pow(base, (double) level) * signum;
     }
     
-    private double apply(LivingEntity entity, double strength) {
+    private void apply(LivingEntity entity, GravityComponent component) {
         MobEffectInstance effectInstance = entity.getEffect(this);
         
         if (effectInstance == null) {
-            return strength;
+            return;
         }
         
         int level = effectInstance.getAmplifier() + 1;
-        return strength * getGravityStrengthMultiplier(level);
+    
+        component.applyGravityStrengthEffect(getGravityStrengthMultiplier(level));
     }
     
     public static void init() {
-        GravityComponent.GRAVITY_STRENGTH_MODIFIER_EVENT.register(
-            (component, strength) -> {
-                double result = strength;
-                
-                if (component.entity instanceof LivingEntity livingEntity) {
-                    result = INCREASE.apply(livingEntity, result);
-                    result = DECREASE.apply(livingEntity, result);
-                    result = REVERSE.apply(livingEntity, result);
-                }
-                
-                return result;
+        GravityComponent.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
+            if (entity instanceof LivingEntity livingEntity) {
+                INCREASE.apply(livingEntity, component);
+                DECREASE.apply(livingEntity, component);
+                REVERSE.apply(livingEntity, component);
             }
-        );
-    
+        });
+        
         Registry.register(
             BuiltInRegistries.MOB_EFFECT,
             new ResourceLocation("gravity_changer:strength_increase"),

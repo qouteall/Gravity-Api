@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.EnumMap;
@@ -53,27 +52,24 @@ public class GravityDirectionMobEffect extends MobEffect {
             );
         }
     
-        GravityComponent.GRAVITY_DIR_MODIFIER_EVENT.register(
-            PHASE, (component, direction) -> {
-                Entity entity = component.entity;
-
+        GravityComponent.GRAVITY_UPDATE_EVENT.register(
+            PHASE, (entity, component) -> {
                 if (!(entity instanceof LivingEntity livingEntity)) {
-                    return direction;
+                    return;
                 }
                 
-                Direction curr = direction;
-                int maxAmplifier = -1;
                 for (GravityDirectionMobEffect dirEffect : GravityDirectionMobEffect.EFFECT_MAP.values()) {
                     MobEffectInstance effectInstance = livingEntity.getEffect(dirEffect);
                     if (effectInstance != null) {
                         int amplifier = effectInstance.getAmplifier();
-                        if (amplifier > maxAmplifier) {
-                            maxAmplifier = amplifier;
-                            curr = dirEffect.gravityDirection;
-                        }
+                        
+                        component.applyGravityDirectionEffect(
+                            dirEffect.gravityDirection,
+                            null,
+                            amplifier + 1.0
+                        );
                     }
                 }
-                return curr;
             }
         );
         
