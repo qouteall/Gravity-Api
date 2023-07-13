@@ -3,6 +3,7 @@ package gravity_changer;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
+import gravity_changer.item.GravityAnchorItem;
 import gravity_changer.mob_effect.GravityPotion;
 import gravity_changer.mob_effect.GravityStrengthMobEffect;
 import gravity_changer.plating.PlatingBlock;
@@ -41,6 +42,7 @@ public class GravityChangerMod implements ModInitializer {
     public void onInitialize() {
         GravityChangerItem.init();
         GravityChangerItemAOE.init();
+        GravityAnchorItem.init();
         
         AutoConfig.register(GravityChangerConfig.class, GsonConfigSerializer::new);
         configHolder = AutoConfig.getConfigHolder(GravityChangerConfig.class);
@@ -76,6 +78,10 @@ public class GravityChangerMod implements ModInitializer {
                 
                 entries.accept(new ItemStack(PlatingBlock.PLATING_BLOCK_ITEM));
                 entries.accept(new ItemStack(PlatingBlock.DENSE_PLATING_BLOCK_ITEM));
+                
+                for (GravityAnchorItem item : GravityAnchorItem.ITEM_MAP.values()) {
+                    entries.accept(new ItemStack(item));
+                }
             })
             .title(Component.translatable("itemGroup.gravity_changer.general"))
             .build();

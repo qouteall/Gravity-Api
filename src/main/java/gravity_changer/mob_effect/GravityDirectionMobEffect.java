@@ -28,6 +28,13 @@ public class GravityDirectionMobEffect extends MobEffect {
     public static final EnumMap<Direction, GravityDirectionMobEffect> EFFECT_MAP =
         new EnumMap<>(Direction.class);
     
+    static {
+        for (Direction dir : Direction.values()) {
+            GravityDirectionMobEffect effect = new GravityDirectionMobEffect(dir);
+            EFFECT_MAP.put(dir, effect);
+        }
+    }
+    
     public static ResourceLocation getEffectId(Direction direction) {
         return switch (direction) {
             case DOWN -> new ResourceLocation("gravity_changer:down");
@@ -41,11 +48,8 @@ public class GravityDirectionMobEffect extends MobEffect {
     
     public static void init() {
         for (Direction dir : Direction.values()) {
-            GravityDirectionMobEffect effect = new GravityDirectionMobEffect(dir);
-            EFFECT_MAP.put(dir, effect);
-    
             Registry.register(
-                BuiltInRegistries.MOB_EFFECT, getEffectId(dir), effect
+                BuiltInRegistries.MOB_EFFECT, getEffectId(dir), EFFECT_MAP.get(dir)
             );
         }
     

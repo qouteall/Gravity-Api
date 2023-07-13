@@ -3,16 +3,24 @@ package gravity_changer.item;
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class GravityChangerItem extends Item {
     public static final Item GRAVITY_CHANGER_DOWN = new GravityChangerItem(new Properties().stacksTo(1), Direction.DOWN);
@@ -34,6 +42,14 @@ public class GravityChangerItem extends Item {
         if (!world.isClientSide())
             GravityChangerAPI.setBaseGravityDirection(user, gravityDirection);
         return InteractionResultHolder.success(user.getItemInHand(hand));
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
+        super.appendHoverText(stack, world, tooltip, context);
+        tooltip.add(Component.translatable("gravity_changer.gravity_changer.tooltip.0"));
+        tooltip.add(Component.translatable("gravity_changer.gravity_changer.tooltip.1"));
     }
     
     public static void init() {

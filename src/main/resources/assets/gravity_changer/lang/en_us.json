@@ -6,6 +6,12 @@
   "item.gravity_changer.gravity_changer_west": "West Gravity Changer",
   "item.gravity_changer.gravity_changer_east": "East Gravity Changer",
 
+  "gravity_changer.gravity_changer.tooltip.0": "Changes base gravity",
+  "gravity_changer.gravity_changer.tooltip.1": "Effects can override base gravity",
+
+  "gravity_changer.gravity_anchor.tooltip.0": "Changes gravity when held",
+  "gravity_changer.gravity_anchor.tooltip.1": "Overrides base gravity and gravity effects",
+
   "item.gravity_changer.gravity_changer_down_aoe": "Down Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_up_aoe": "Up Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_north_aoe": "North Gravity Changer AOE",
@@ -15,18 +21,36 @@
 
   "item.minecraft.potion.effect.gravity_decr_0": "Potion of Gravity Decrease",
   "item.minecraft.potion.effect.gravity_decr_1": "Potion of Gravity Decrease",
-  "item.minecraft.potion.effect.gravity_incr": "Potion of Gravity Increase",
+  "item.minecraft.potion.effect.gravity_incr_0": "Potion of Gravity Increase",
   "item.minecraft.potion.effect.gravity_incr_1": "Potion of Gravity Increase",
+  "item.minecraft.potion.effect.gravity_down_0": "Potion of Down Gravity",
+  "item.minecraft.potion.effect.gravity_up_0": "Potion of Up Gravity",
+  "item.minecraft.potion.effect.gravity_north_0": "Potion of North Gravity",
+  "item.minecraft.potion.effect.gravity_south_0": "Potion of South Gravity",
+  "item.minecraft.potion.effect.gravity_west_0": "Potion of West Gravity",
+  "item.minecraft.potion.effect.gravity_east_0": "Potion of East Gravity",
 
   "item.minecraft.splash_potion.effect.gravity_decr_0": "Splash Potion of Gravity Decrease",
   "item.minecraft.splash_potion.effect.gravity_decr_1": "Splash Potion of Gravity Decrease",
-  "item.minecraft.splash_potion.effect.gravity_incr": "Splash Potion of Gravity Increase",
+  "item.minecraft.splash_potion.effect.gravity_incr_0": "Splash Potion of Gravity Increase",
   "item.minecraft.splash_potion.effect.gravity_incr_1": "Splash Potion of Gravity Increase",
+  "item.minecraft.splash_potion.effect.gravity_down_0": "Splash Potion of Down Gravity",
+  "item.minecraft.splash_potion.effect.gravity_up_0": "Splash Potion of Up Gravity",
+  "item.minecraft.splash_potion.effect.gravity_north_0": "Splash Potion of North Gravity",
+  "item.minecraft.splash_potion.effect.gravity_south_0": "Splash Potion of South Gravity",
+  "item.minecraft.splash_potion.effect.gravity_west_0": "Splash Potion of West Gravity",
+  "item.minecraft.splash_potion.effect.gravity_east_0": "Splash Potion of East Gravity",
 
   "item.minecraft.lingering_potion.effect.gravity_decr_0": "Lingering Potion of Gravity Decrease",
   "item.minecraft.lingering_potion.effect.gravity_decr_1": "Lingering Potion of Gravity Decrease",
-  "item.minecraft.lingering_potion.effect.gravity_incr": "Lingering Potion of Gravity Increase",
+  "item.minecraft.lingering_potion.effect.gravity_incr_0": "Lingering Potion of Gravity Increase",
   "item.minecraft.lingering_potion.effect.gravity_incr_1": "Lingering Potion of Gravity Increase",
+  "item.minecraft.lingering_potion.effect.gravity_down_0": "Lingering Potion of Down Gravity",
+  "item.minecraft.lingering_potion.effect.gravity_up_0": "Lingering Potion of Up Gravity",
+  "item.minecraft.lingering_potion.effect.gravity_north_0": "Lingering Potion of North Gravity",
+  "item.minecraft.lingering_potion.effect.gravity_south_0": "Lingering Potion of South Gravity",
+  "item.minecraft.lingering_potion.effect.gravity_west_0": "Lingering Potion of West Gravity",
+  "item.minecraft.lingering_potion.effect.gravity_east_0": "Lingering Potion of East Gravity",
 
   "effect.gravity_changer.strength_increase": "Gravity Increase",
   "effect.gravity_changer.strength_decrease": "Gravity Decrease",
@@ -87,5 +111,10 @@
 
   "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar": "Void Damage On Horizontal Fall Too Far",
   "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar.@Tooltip[0]": "When the gravity is horizontal and falling for at least 1024 blocks,",
-    "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar.@Tooltip[1]": "the entity will start taking void damage"
+  "text.autoconfig.gravity_changer.option.voidDamageOnHorizontalFallTooFar.@Tooltip[1]": "the entity will start taking void damage",
+
+  "text.autoconfig.gravity_changer.option.autoJumpOnGravityPlateInnerCorner": "Auto Jump On Gravity Plate Inner Corner",
+
+  "text.autoconfig.gravity_changer.option.adjustPositionAfterChangingGravity": "Adjust Position After Changing Gravity"
+
 }
