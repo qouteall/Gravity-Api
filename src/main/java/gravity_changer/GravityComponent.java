@@ -125,6 +125,17 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             baseGravityDirection = Direction.DOWN;
         }
         
+        // the current gravity is serialized to avoid unnecessary gravity rotation when entering world
+        // only deserialize it when initializing entity
+        if (!initialized) {
+            if (tag.contains("currentGravityDirection")) {
+                currGravityDirection = Direction.byName(tag.getString("currentGravityDirection"));
+            }
+            else {
+                currGravityDirection = Direction.DOWN;
+            }
+        }
+        
         if (tag.contains("baseGravityStrength")) {
             baseGravityStrength = tag.getDouble("baseGravityStrength");
         }
@@ -145,6 +156,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     @Override
     public void writeToNbt(@NotNull CompoundTag tag) {
         tag.putString("baseGravityDirection", baseGravityDirection.getName());
+        tag.putString("currentGravityDirection", currGravityDirection.getName());
         tag.putDouble("baseGravityStrength", baseGravityStrength);
     }
     
@@ -153,9 +165,9 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         if (!canChangeGravity()) {
             return;
         }
-    
+        
         updateGravityStatus();
-    
+        
         applyGravityChange();
         
         if (!entity.level().isClientSide()) {

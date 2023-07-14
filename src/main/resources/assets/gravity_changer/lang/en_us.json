@@ -6,18 +6,19 @@
   "item.gravity_changer.gravity_changer_west": "West Gravity Changer",
   "item.gravity_changer.gravity_changer_east": "East Gravity Changer",
 
-  "gravity_changer.gravity_changer.tooltip.0": "Changes base gravity",
-  "gravity_changer.gravity_changer.tooltip.1": "Effects can override base gravity",
-
-  "gravity_changer.gravity_anchor.tooltip.0": "Changes gravity when held",
-  "gravity_changer.gravity_anchor.tooltip.1": "Overrides base gravity and gravity effects",
-
   "item.gravity_changer.gravity_changer_down_aoe": "Down Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_up_aoe": "Up Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_north_aoe": "North Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_south_aoe": "South Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_west_aoe": "West Gravity Changer AOE",
   "item.gravity_changer.gravity_changer_east_aoe": "East Gravity Changer AOE",
+
+  "item.gravity_changer.gravity_anchor_down": "Down Gravity Anchor",
+  "item.gravity_changer.gravity_anchor_up": "Up Gravity Anchor",
+  "item.gravity_changer.gravity_anchor_north": "North Gravity Anchor",
+  "item.gravity_changer.gravity_anchor_south": "South Gravity Anchor",
+  "item.gravity_changer.gravity_anchor_west": "West Gravity Anchor",
+  "item.gravity_changer.gravity_anchor_east": "East Gravity Anchor",
 
   "item.minecraft.potion.effect.gravity_decr_0": "Potion of Gravity Decrease",
   "item.minecraft.potion.effect.gravity_decr_1": "Potion of Gravity Decrease",
@@ -51,6 +52,12 @@
   "item.minecraft.lingering_potion.effect.gravity_south_0": "Lingering Potion of South Gravity",
   "item.minecraft.lingering_potion.effect.gravity_west_0": "Lingering Potion of West Gravity",
   "item.minecraft.lingering_potion.effect.gravity_east_0": "Lingering Potion of East Gravity",
+
+  "gravity_changer.gravity_changer.tooltip.0": "Changes base gravity",
+  "gravity_changer.gravity_changer.tooltip.1": "Effects can override base gravity",
+
+  "gravity_changer.gravity_anchor.tooltip.0": "Changes gravity when held",
+  "gravity_changer.gravity_anchor.tooltip.1": "Overrides base gravity and gravity effects",
 
   "effect.gravity_changer.strength_increase": "Gravity Increase",
   "effect.gravity_changer.strength_decrease": "Gravity Decrease",

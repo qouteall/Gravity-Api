@@ -22,12 +22,21 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GravityChangerMod implements ModInitializer {
     public static final String NAMESPACE = "gravity_changer";
@@ -81,6 +90,22 @@ public class GravityChangerMod implements ModInitializer {
                 
                 for (GravityAnchorItem item : GravityAnchorItem.ITEM_MAP.values()) {
                     entries.accept(new ItemStack(item));
+                }
+                
+                // gravity potions are both in food tab and gravity changer tab
+                List<Map.Entry<ResourceKey<Potion>, Potion>> gravityPotionEntries =
+                    BuiltInRegistries.POTION.entrySet().stream()
+                        .filter(e -> e.getKey().location().getNamespace().equals(NAMESPACE))
+                        .toList();
+                
+                Item[] potionItems = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION};
+                
+                for (Item potionItem : potionItems) {
+                    for (Map.Entry<ResourceKey<Potion>, Potion> e : gravityPotionEntries) {
+                        Potion potion = e.getValue();
+                        ItemStack stack = PotionUtils.setPotion(new ItemStack(potionItem), potion);
+                        entries.accept(stack);
+                    }
                 }
             })
             .title(Component.translatable("itemGroup.gravity_changer.general"))
