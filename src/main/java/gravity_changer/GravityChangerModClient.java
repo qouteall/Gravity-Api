@@ -1,6 +1,6 @@
 package gravity_changer;
 
-import gravity_changer.plating.PlatingBlock;
+import gravity_changer.plating.GravityPlatingBlock;
 import gravity_changer.util.GCUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -32,8 +32,7 @@ public class GravityChangerModClient implements ClientModInitializer {
             }
         });
         
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), PlatingBlock.PLATING_BLOCK);
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), PlatingBlock.DENSE_PLATING_BLOCK);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), GravityPlatingBlock.PLATING_BLOCK);
         
     }
 }

@@ -67,9 +67,15 @@
   "effect.gravity_changer.south": "South Gravity",
   "effect.gravity_changer.west": "West Gravity",
   "effect.gravity_changer.east": "East Gravity",
+  "effect.gravity_changer.invert": "Invert Gravity",
 
   "block.gravity_changer.plating": "Gravity Plating",
   "block.gravity_changer.plating_dense": "Dense Gravity Plating",
+
+  "gravity_changer.plating.item_name": "Gravity Plating (Range: %s, Force: %s)",
+  "gravity_changer.plating.tooltip.0": "Generates Gravity Field",
+  "gravity_changer.plating.tooltip.1": "Interact with bare hand to decrease range or reverse force",
+  "gravity_changer.plating.tooltip.2": "Interact with Amethyst Cluster to increase range",
 
   "itemGroup.gravity_changer.general": "Gravity Changer",
 
@@ -86,6 +92,11 @@
   "commands.gravity.get.other": "%s's gravity is %s",
   "commands.gravity.set.self": "Set own gravity to %s",
   "commands.gravity.set.other": "Set %s's gravity to %s",
+
+  "gravity_changer.plate.wrong_interaction": "Interact with this using amethyst or bare hand",
+  "gravity_changer.plate.status": "Side: %s  Range: %s  Force: %s ",
+  "gravity_changer.plate.force.attract": "Attract",
+  "gravity_changer.plate.force.repulse": "Repulse",
 
   "text.autoconfig.gravity_changer.title": "GravityChanger Config",
 

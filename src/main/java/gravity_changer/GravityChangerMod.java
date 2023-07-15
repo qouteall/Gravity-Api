@@ -6,12 +6,13 @@ import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.item.GravityAnchorItem;
 import gravity_changer.mob_effect.GravityPotion;
 import gravity_changer.mob_effect.GravityStrengthMobEffect;
-import gravity_changer.plating.PlatingBlock;
-import gravity_changer.plating.PlatingBlockEntity;
+import gravity_changer.plating.GravityPlatingBlock;
+import gravity_changer.plating.GravityPlatingBlockEntity;
 import gravity_changer.item.GravityChangerItem;
 import gravity_changer.item.GravityChangerItemAOE;
 import gravity_changer.mob_effect.GravityDirectionMobEffect;
 import gravity_changer.mob_effect.GravityInvertMobEffect;
+import gravity_changer.plating.GravityPlatingItem;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.event.ConfigSerializeEvent;
@@ -22,7 +23,6 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
@@ -33,10 +33,6 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GravityChangerMod implements ModInitializer {
     public static final String NAMESPACE = "gravity_changer";
@@ -84,25 +80,38 @@ public class GravityChangerMod implements ModInitializer {
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_WEST_AOE));
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_NORTH_AOE));
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_SOUTH_AOE));
-                
-                entries.accept(new ItemStack(PlatingBlock.PLATING_BLOCK_ITEM));
-                entries.accept(new ItemStack(PlatingBlock.DENSE_PLATING_BLOCK_ITEM));
+    
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(true, 1)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(true, 2)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(true, 8)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(true, 32)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(true, 64)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(false, 8)
+                ));
+                entries.accept(GravityPlatingItem.createStack(
+                    new GravityPlatingBlockEntity.SideData(false, 32)
+                ));
                 
                 for (GravityAnchorItem item : GravityAnchorItem.ITEM_MAP.values()) {
                     entries.accept(new ItemStack(item));
                 }
                 
                 // gravity potions are both in food tab and gravity changer tab
-                List<Map.Entry<ResourceKey<Potion>, Potion>> gravityPotionEntries =
-                    BuiltInRegistries.POTION.entrySet().stream()
-                        .filter(e -> e.getKey().location().getNamespace().equals(NAMESPACE))
-                        .toList();
-                
                 Item[] potionItems = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION};
                 
                 for (Item potionItem : potionItems) {
-                    for (Map.Entry<ResourceKey<Potion>, Potion> e : gravityPotionEntries) {
-                        Potion potion = e.getValue();
+                    for (Potion potion: GravityPotion.ALL) {
                         ItemStack stack = PotionUtils.setPotion(new ItemStack(potionItem), potion);
                         entries.accept(stack);
                     }
@@ -121,8 +130,9 @@ public class GravityChangerMod implements ModInitializer {
         GravityStrengthMobEffect.init();
         GravityPotion.init();
         
-        PlatingBlock.init();
-        PlatingBlockEntity.init();
+        GravityPlatingBlock.init();
+        GravityPlatingItem.init();
+        GravityPlatingBlockEntity.init();
     }
     
     public static ResourceLocation id(String path) {

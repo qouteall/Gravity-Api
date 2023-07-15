@@ -1,15 +1,13 @@
 package gravity_changer.command;
 
 import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.api.RotationParameters;
+import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -81,7 +79,7 @@ public class GravityCommand {
     }
     
     private static void getSendFeedback(CommandSourceStack source, Entity entity, Direction gravityDirection) {
-        Component text = Component.translatable("direction." + gravityDirection.getName());
+        Component text = GCUtil.getDirectionText(gravityDirection);
         if (source.getEntity() != null && source.getEntity() == entity) {
             source.sendSuccess(() -> Component.translatable("commands.gravity.get.self", text), true);
         }

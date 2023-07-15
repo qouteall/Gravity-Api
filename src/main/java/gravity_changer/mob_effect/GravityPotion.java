@@ -58,6 +58,19 @@ public class GravityPotion {
         };
     }
     
+    public static final Potion[] ALL = new Potion[]{
+        STRENGTH_DECR_POTION_0,
+        STRENGTH_DECR_POTION_1,
+        STRENGTH_INCR_POTION_0,
+        STRENGTH_INCR_POTION_1,
+        DIR_POTIONS.get(Direction.DOWN),
+        DIR_POTIONS.get(Direction.UP),
+        DIR_POTIONS.get(Direction.NORTH),
+        DIR_POTIONS.get(Direction.SOUTH),
+        DIR_POTIONS.get(Direction.WEST),
+        DIR_POTIONS.get(Direction.EAST)
+    };
+    
     public static void init() {
         Registry.register(
             BuiltInRegistries.POTION,

@@ -1,15 +1,17 @@
 package gravity_changer.plating;
 
 import com.google.common.collect.ImmutableMap;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -21,29 +23,33 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Based on code from AmethystGravity (by CyborgCabbage)
  */
-public class PlatingBlock extends BaseEntityBlock {
+public class GravityPlatingBlock extends BaseEntityBlock {
     // in a corner, multiple faces of plates can occupy the same block
     
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -61,36 +67,18 @@ public class PlatingBlock extends BaseEntityBlock {
     protected static final VoxelShape EAST_SHAPE = Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
     private final Map<BlockState, VoxelShape> shapesByState;
     
-    public final double gravityEffectHeight;
-    
-    public static final Block PLATING_BLOCK = new PlatingBlock(
-        0.9, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
+    public static final Block PLATING_BLOCK = new GravityPlatingBlock(
+        FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
     );
-    public static final Block DENSE_PLATING_BLOCK = new PlatingBlock(
-        2.0, FabricBlockSettings.of().noOcclusion().noCollission().instabreak()
-    );
-    
-    public static final Item PLATING_BLOCK_ITEM = new BlockItem(PLATING_BLOCK, new FabricItemSettings());
-    public static final Item DENSE_PLATING_BLOCK_ITEM = new BlockItem(DENSE_PLATING_BLOCK, new FabricItemSettings());
     
     public static void init() {
         Registry.register(
             BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:plating"), PLATING_BLOCK
         );
-        Registry.register(
-            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:plating"), PLATING_BLOCK_ITEM
-        );
-        Registry.register(
-            BuiltInRegistries.BLOCK, new ResourceLocation("gravity_changer:plating_dense"), DENSE_PLATING_BLOCK
-        );
-        Registry.register(
-            BuiltInRegistries.ITEM, new ResourceLocation("gravity_changer:plating_dense"), DENSE_PLATING_BLOCK_ITEM
-        );
     }
     
-    public PlatingBlock(double effectHeight, Properties settings) {
+    public GravityPlatingBlock(Properties settings) {
         super(settings);
-        gravityEffectHeight = effectHeight;
         registerDefaultState(getStateDefinition().any()
             .setValue(NORTH, false)
             .setValue(EAST, false)
@@ -102,7 +90,7 @@ public class PlatingBlock extends BaseEntityBlock {
         this.shapesByState =
             ImmutableMap.copyOf(
                 this.stateDefinition.getPossibleStates().stream()
-                    .collect(Collectors.toMap(Function.identity(), PlatingBlock::getShapeForState))
+                    .collect(Collectors.toMap(Function.identity(), GravityPlatingBlock::getShapeForState))
             );
     }
     
@@ -186,7 +174,7 @@ public class PlatingBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new PlatingBlockEntity(pos, state);
+        return new GravityPlatingBlockEntity(pos, state);
     }
     
     @Override
@@ -198,9 +186,9 @@ public class PlatingBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         if (world.isClientSide)
-            return createTickerHelper(type, PlatingBlockEntity.TYPE, PlatingBlockEntity::tick);
+            return createTickerHelper(type, GravityPlatingBlockEntity.TYPE, GravityPlatingBlockEntity::tick);
         else
-            return createTickerHelper(type, PlatingBlockEntity.TYPE, PlatingBlockEntity::tick);
+            return createTickerHelper(type, GravityPlatingBlockEntity.TYPE, GravityPlatingBlockEntity::tick);
     }
     
     @Override
@@ -252,14 +240,6 @@ public class PlatingBlock extends BaseEntityBlock {
         };
     }
     
-    public static void foreachDirection(BlockState blockState, Consumer<Direction> func) {
-        for (Direction dir : Direction.values()) {
-            if (hasDir(blockState, dir)) {
-                func.accept(dir);
-            }
-        }
-    }
-    
     // Note: the direction is gravity field direction. the facing is the opposite
     public static boolean hasDir(BlockState blockState, Direction dir) {
         return blockState.getValue(directionToProperty(dir));
@@ -279,56 +259,58 @@ public class PlatingBlock extends BaseEntityBlock {
         return list;
     }
     
-    public AABB getGravityEffectBox(Level world, BlockPos blockPos, Direction plateDir) {
-        double expand = 0.001;
-        
-        double minX = blockPos.getX() - expand;
-        double minY = blockPos.getY() - expand;
-        double minZ = blockPos.getZ() - expand;
-        double maxX = blockPos.getX() + 1 + expand;
-        double maxY = blockPos.getY() + 1 + expand;
-        double maxZ = blockPos.getZ() + 1 + expand;
-        
-        double delta = gravityEffectHeight - 1;
-        switch (plateDir) {
-            case DOWN -> maxY += delta;
-            case UP -> minY -= delta;
-            case NORTH -> maxZ += delta;
-            case SOUTH -> minZ -= delta;
-            case WEST -> maxX += delta;
-            case EAST -> minX -= delta;
+    @Override
+    public InteractionResult use(
+        BlockState state, Level level, BlockPos pos, Player player,
+        InteractionHand hand, BlockHitResult hit
+    ) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
         
-        BlockPos wallPos = blockPos.relative(plateDir);
-        for (Direction sideDir : Direction.values()) {
-            if (sideDir.getAxis() != plateDir.getAxis()) {
-                BlockPos sidePos = wallPos.relative(sideDir);
-                BlockState sideBlockState = world.getBlockState(sidePos);
-                if (sideBlockState.getBlock() instanceof PlatingBlock sidePlatingBlock) {
-                    if (hasDir(sideBlockState, sideDir.getOpposite())) {
-                        double sideDelta = sidePlatingBlock.gravityEffectHeight;
-                        switch (sideDir) {
-                            case DOWN -> minY -= sideDelta;
-                            case UP -> maxY += sideDelta;
-                            case NORTH -> minZ -= sideDelta;
-                            case SOUTH -> maxZ += sideDelta;
-                            case WEST -> minX -= sideDelta;
-                            case EAST -> maxX += sideDelta;
-                        }
-                    }
-                }
+        Direction hitDir = hit.getDirection();
+        Direction plateDir = hitDir.getOpposite();
+        
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        
+        if (!(blockEntity instanceof GravityPlatingBlockEntity be)) {
+            return InteractionResult.FAIL;
+        }
+        
+        return be.interact(level, pos, plateDir, player, hand);
+    }
+    
+    /**
+     * Similar to {@link ShulkerBoxBlock#playerWillDestroy(Level, BlockPos, BlockState, Player)}
+     * Make it drop in creative mode.
+     */
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof GravityPlatingBlockEntity be && !level.isClientSide && player.isCreative()) {
+            List<ItemStack> drops = be.getDrops();
+        
+            for (ItemStack itemStack : drops) {
+                ItemEntity itemEntity = new ItemEntity(
+                    level,
+                    (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5,
+                    itemStack
+                );
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
             }
         }
         
-        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+        super.playerWillDestroy(level, pos, state, player);
     }
     
-    public AABB getRoughEffectBox(BlockPos blockPos) {
-        double expand = 0.001;
-        double delta = this.gravityEffectHeight + expand;
-        return new AABB(
-            blockPos.getX() - delta, blockPos.getY() - delta, blockPos.getZ() - delta,
-            blockPos.getX() + 1 + delta, blockPos.getY() + 1 + delta, blockPos.getZ() + 1 + delta
-        );
+    @Override
+    public List<ItemStack> getDrops(BlockState blockState, LootParams.Builder builder) {
+        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof GravityPlatingBlockEntity be) {
+            return be.getDrops();
+        }
+        
+        return List.of();
     }
 }
