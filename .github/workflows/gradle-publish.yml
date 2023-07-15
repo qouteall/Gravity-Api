@@ -25,21 +25,21 @@ jobs:
     - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
       with:
         gradle-version: 8.1.1
-        arguments: build
+        arguments: build publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - uses: Kir-Antipov/mc-publish@v3.2
-      with:
-        version-type: alpha
-        dependencies: ""
-        changelog: ""
-
-        files-primary: build/libs/!(*-@(dev|sources|javadoc)).jar
-        files-secondary: ""
-
-        modrinth-id: bqOyYdKi
-        modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-        modrinth-featured: false
-
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+#    - uses: Kir-Antipov/mc-publish@v3.2
+#      with:
+#        version-type: alpha
+#        dependencies: ""
+#        changelog: ""
+#
+#        files-primary: build/libs/!(*-@(dev|sources|javadoc)).jar
+#        files-secondary: ""
+#
+#        modrinth-id: bqOyYdKi
+#        modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+#        modrinth-featured: false
+#
+#        github-token: ${{ secrets.GITHUB_TOKEN }}
