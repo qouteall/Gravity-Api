@@ -9,10 +9,14 @@ and Fabric mod cannot depend on a Quilt mod.
 This Gravity Changer mod is not identical to Fusion's Gravity API.
 **The two mods cannot be used interchangeably.**
 
-Its gravity plating functionality is based on contents from [AmethystGravity](https://modrinth.com/mod/amethyst-gravity) by CyborgCabbage.
+### Added features
+
+* Gravity effects and potions.
+* Gravity anchor. Changes gravity when held. (Some resources come from [AmethystGravity](https://modrinth.com/mod/amethyst-gravity) by CyborgCabbage)
+* Gravity plating. Generates gravity field. Allows adjusting effect range. (Some code and resources come from AmethystGravity)
+
+The gravity potions, anchors and plating are not obtainable from normal survival.
 
 ### Future development goal
 
-* Explore the possibility of using world-coordinate velocity instead of entity-local velocity to simplify future development. Do aggressive rewrite to MC collision code and use Lithium's collision code which is faster.
-* Utilize vanilla effect system to replace the current gravity list thing and gravity inversion. This will also make gravity potion easier to implement. The effects could also be used for gravity strength changing.
-* Let the user mod to do its verification logic. No need to put verification inside Gravity Changer. (Immersive Portals does its teleportation verification outside of gravity changer.) This will reduce overall complexity.
+* Explore the possibility of using world-coordinate velocity (although it requires more mixin it's easier to debug and maintain) instead of entity-local velocity to simplify future development. Do aggressive rewrite (simpler and faster than many mixins) to MC collision code and use Lithium's collision code which is faster.
