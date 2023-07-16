@@ -17,6 +17,20 @@ This Gravity Changer mod is not identical to Fusion's Gravity API.
 
 The gravity potions, anchors and plating are not obtainable from normal survival.
 
+### How to use the API
+
+#### Add dependency
+
+Add this into `repositories`
+```
+maven { url 'https://jitpack.io' }
+```
+
+Add this into `dependencies`
+```
+modImplementation("com.github.qouteall:GravityChanger:v1.0.2-mc1.20.1")
+```
+
 ### Future development goal
 
 * Explore the possibility of using world-coordinate velocity (although it requires more mixin it's easier to debug and maintain) instead of entity-local velocity to simplify future development. Do aggressive rewrite (simpler and faster than many mixins) to MC collision code and use Lithium's collision code which is faster.
