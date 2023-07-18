@@ -50,7 +50,7 @@ public class GravityCommand {
         
         builder.then(Commands.literal("set_base_strength")
             .then(Commands.argument("entities", EntityArgument.entities())
-                .then(Commands.argument("strength", DoubleArgumentType.doubleArg(0, 1))
+                .then(Commands.argument("strength", DoubleArgumentType.doubleArg(-20, 20))
                     .executes(context -> {
                         Collection<? extends Entity> entities = EntityArgument.getEntities(context, "entities");
                         double strength = DoubleArgumentType.getDouble(context, "strength");
@@ -76,6 +76,8 @@ public class GravityCommand {
                 })
             )
         );
+        
+        dispatcher.register(builder);
     }
     
     private static void getSendFeedback(CommandSourceStack source, Entity entity, Direction gravityDirection) {

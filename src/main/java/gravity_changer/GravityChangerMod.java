@@ -1,6 +1,7 @@
 package gravity_changer;
 
 import gravity_changer.api.RotationParameters;
+import gravity_changer.command.DirectionArgumentType;
 import gravity_changer.command.GravityCommand;
 import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.item.GravityAnchorItem;
@@ -80,7 +81,7 @@ public class GravityChangerMod implements ModInitializer {
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_WEST_AOE));
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_NORTH_AOE));
                 entries.accept(new ItemStack(GravityChangerItemAOE.GRAVITY_CHANGER_SOUTH_AOE));
-    
+                
                 entries.accept(GravityPlatingItem.createStack(
                     new GravityPlatingBlockEntity.SideData(true, 1)
                 ));
@@ -111,7 +112,7 @@ public class GravityChangerMod implements ModInitializer {
                 Item[] potionItems = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION};
                 
                 for (Item potionItem : potionItems) {
-                    for (Potion potion: GravityPotion.ALL) {
+                    for (Potion potion : GravityPotion.ALL) {
                         ItemStack stack = PotionUtils.setPotion(new ItemStack(potionItem), potion);
                         entries.accept(stack);
                     }
@@ -133,6 +134,8 @@ public class GravityChangerMod implements ModInitializer {
         GravityPlatingBlock.init();
         GravityPlatingItem.init();
         GravityPlatingBlockEntity.init();
+        
+        DirectionArgumentType.init();
     }
     
     public static ResourceLocation id(String path) {
