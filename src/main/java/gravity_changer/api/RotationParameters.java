@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 
 public record RotationParameters(
     boolean rotateVelocity,
-    boolean rotateView,
+    boolean rotateView, // currently ignores this
     int rotationTimeMS
 ) {
     public static RotationParameters defaultParam = new RotationParameters(

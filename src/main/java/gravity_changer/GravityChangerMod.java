@@ -3,6 +3,7 @@ package gravity_changer;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.command.DirectionArgumentType;
 import gravity_changer.command.GravityCommand;
+import gravity_changer.command.LocalDirectionArgumentType;
 import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.item.GravityAnchorItem;
 import gravity_changer.mob_effect.GravityPotion;
@@ -136,6 +137,7 @@ public class GravityChangerMod implements ModInitializer {
         GravityPlatingBlockEntity.init();
         
         DirectionArgumentType.init();
+        LocalDirectionArgumentType.init();
     }
     
     public static ResourceLocation id(String path) {

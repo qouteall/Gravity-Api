@@ -88,6 +88,9 @@
   "direction.west": "West",
   "direction.east": "East",
 
+  "gravity_changer.command.inform": "Base Gravity Direction: %s, Base Gravity Strength: %s",
+  "gravity_changer.command.dimension_info": "Dimension Gravity Strength: %s",
+
   "commands.gravity.get.self": "Your gravity is %s",
   "commands.gravity.get.other": "%s's gravity is %s",
   "commands.gravity.set.self": "Set own gravity to %s",

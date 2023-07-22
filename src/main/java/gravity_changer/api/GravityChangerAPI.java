@@ -80,6 +80,11 @@ public abstract class GravityChangerAPI {
         return getGravityComponent(entity).getRotationAnimation();
     }
     
+    /**
+     * Instantly set gravity direction on client side without performing animation.
+     * Not needed in normal cases.
+     * (Used by ImmPtl)
+     */
     public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
         Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
         
