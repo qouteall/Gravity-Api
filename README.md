@@ -37,9 +37,11 @@ This mod's commands are different to Gravity API's. These are the commands in th
 
 `/gravity view_dimension_info` shows the dimensional gravity strength for the current dimension.
 
-### Other
+### What Entities Can Change Gravity
 
-This mod adds the void damage for the entites that are 
+By default, all living entities, projectiles and minecarts can change gravity.
+
+For other entity types, the entity types that are in tag `gravity_changer:allowed_special` can change gravity.
 
 ### How to use the API
 
