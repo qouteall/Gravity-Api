@@ -11,6 +11,7 @@
     "DirectionMixin",
     "DrownedEntityMixin",
     "EndermanEntityMixin",
+    "EntityAccessor",
     "EntityMixin",
     "EntityShapeContextMixin",
     "ExperienceBottleEntityMixin",
@@ -40,7 +41,6 @@
     "PotionEntityMixin",
     "ProjectileEntityMixin",
     "RamImpactTaskMixin",
-    "fall_distance.ServerPlayerEntityMixin_FallDistance",
     "ServerPlayNetworkHandlerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerEntityMixin",
@@ -50,7 +50,8 @@
     "TntEntityMixin",
     "WitchEntityMixin",
     "WitherEntityMixin",
-    "WolfBegGoalMixin"
+    "WolfBegGoalMixin",
+    "fall_distance.ServerPlayerEntityMixin_FallDistance"
   ],
   "client": [
     "client.BiomeEffectSoundPlayerMixin",

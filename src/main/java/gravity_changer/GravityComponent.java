@@ -6,6 +6,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
+import gravity_changer.mixin.EntityAccessor;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -162,20 +163,20 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     @Override
     public void tick() {
-        if (!canChangeGravity()) {
-            return;
-        }
-        
-        updateGravityStatus();
-        
-        applyGravityChange();
-        
-        if (!entity.level().isClientSide()) {
-            if (needsSync) {
-                needsSync = false;
-                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
-            }
-        }
+//        if (!canChangeGravity()) {
+//            return;
+//        }
+//
+//        updateGravityStatus();
+//
+//        applyGravityChange();
+//
+//        if (!entity.level().isClientSide()) {
+//            if (needsSync) {
+//                needsSync = false;
+//                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+//            }
+//        }
     }
     
     public void updateGravityStatus() {
@@ -273,7 +274,18 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         Direction oldGravity, Direction newGravity,
         RotationParameters rotationParameters, boolean isInitialization
     ) {
-        entity.setPos(entity.position()); // Causes bounding box recalculation
+        if (!canChangeGravity()) {
+            return;
+        }
+        
+        // update bounding box
+        entity.setBoundingBox(((EntityAccessor) entity).gc_makeBoundingBox());
+        
+        // A weird thing is that,
+        // using `entity.setPos(entity.position())` to a painting on client side
+        // make the painting move wrongly, because Painting overrides `trackingPosition()`.
+        // No entity other than Painting overrides that method.
+        // It seems to be legacy code from early versions of Minecraft.
         
         if (isInitialization) {
             return;
