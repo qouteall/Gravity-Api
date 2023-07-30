@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-
+    "minecraft:experience_orb",
+    "minecraft:eye_of_ender",
+    "minecraft:falling_block",
+    "minecraft:item",
+    "minecraft:tnt"
   ]
 }

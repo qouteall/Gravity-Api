@@ -37,6 +37,9 @@ This mod's commands are different to Gravity API's. These are the commands in th
 
 `/gravity view_dimension_info` shows the dimensional gravity strength for the current dimension.
 
+### Other
+
+This mod adds the void damage for the entites that are 
 
 ### How to use the API
 

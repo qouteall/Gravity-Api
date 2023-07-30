@@ -163,20 +163,20 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     
     @Override
     public void tick() {
-//        if (!canChangeGravity()) {
-//            return;
-//        }
-//
-//        updateGravityStatus();
-//
-//        applyGravityChange();
-//
-//        if (!entity.level().isClientSide()) {
-//            if (needsSync) {
-//                needsSync = false;
-//                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
-//            }
-//        }
+        if (!canChangeGravity()) {
+            return;
+        }
+        
+        updateGravityStatus();
+        
+        applyGravityChange();
+        
+        if (!entity.level().isClientSide()) {
+            if (needsSync) {
+                needsSync = false;
+                GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+            }
+        }
     }
     
     public void updateGravityStatus() {

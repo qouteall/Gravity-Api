@@ -1,9 +1,10 @@
 package gravity_changer.api;
 
-import gravity_changer.GravityChangerComponents;
-import gravity_changer.EntityTags;
-import gravity_changer.GravityComponent;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import gravity_changer.DimensionGravityDataComponent;
+import gravity_changer.EntityTags;
+import gravity_changer.GravityChangerComponents;
+import gravity_changer.GravityComponent;
 import gravity_changer.RotationAnimation;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
@@ -12,7 +13,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
@@ -122,6 +122,10 @@ public abstract class GravityChangerAPI {
      */
     public static Vec3 getEyeOffset(Entity entity) {
         return RotationUtil.vecPlayerToWorld(0, (double) entity.getEyeHeight(), 0, getGravityDirection(entity));
+    }
+    
+    public static boolean canChangeGravity(Entity entity) {
+        return EntityTags.canChangeGravity(entity);
     }
     
 }

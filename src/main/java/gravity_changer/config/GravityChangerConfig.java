@@ -19,9 +19,9 @@ public class GravityChangerConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 2)
     public boolean resetGravityOnRespawn = true;
     @ConfigEntry.Gui.Tooltip(count = 2)
-    public boolean voidDamageAboveWorld = false;
+    public boolean voidDamageAboveWorld = true;
     @ConfigEntry.Gui.Tooltip(count = 2)
-    public boolean voidDamageOnHorizontalFallTooFar = false;
+    public boolean voidDamageOnHorizontalFallTooFar = true;
     
     public boolean autoJumpOnGravityPlateInnerCorner = true;
     public boolean adjustPositionAfterChangingGravity = true;

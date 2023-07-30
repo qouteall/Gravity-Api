@@ -2,9 +2,7 @@ package gravity_changer.mixin;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.GravityChangerMod;
-
 import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.config.GravityChangerConfig;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,11 +24,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
-
 
 import java.util.List;
 
@@ -635,9 +637,11 @@ public abstract class EntityMixin {
     )
     private void inject_attemptTickInVoid(CallbackInfo ci) {
         Entity this_ = (Entity) (Object) this;
-        
+    
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this_);
         if (GravityChangerMod.config.voidDamageAboveWorld &&
-            this.getY() > (double) (this.level.getMaxBuildHeight() + 256)
+            this.getY() > (double) (this.level.getMaxBuildHeight() + 256) &&
+            gravityDirection == Direction.UP
         ) {
             this.onBelowWorld();
             ci.cancel();
@@ -645,7 +649,7 @@ public abstract class EntityMixin {
         }
         
         if (GravityChangerMod.config.voidDamageOnHorizontalFallTooFar &&
-            GravityChangerAPI.getGravityDirection(this_).getAxis() != Direction.Axis.Y &&
+            gravityDirection.getAxis() != Direction.Axis.Y &&
             fallDistance > 1024
         ) {
             this.onBelowWorld();
