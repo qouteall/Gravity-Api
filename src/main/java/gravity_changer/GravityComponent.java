@@ -7,6 +7,7 @@ import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.api.RotationParameters;
 import gravity_changer.mixin.EntityAccessor;
+import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -15,6 +16,7 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -37,7 +39,10 @@ import org.slf4j.Logger;
  * 3. gravity effects, can override modified gravity
  * The result of applying 1 and 2 is called modified gravity and is synced.
  * The result of 3 is current gravity and is not synced.
- * The gravity effect should be applied both on client and server.
+ * The gravity effect should be applied both on client and server, except for remote players.
+ * (The effect data of remote players are not synced to the current player,
+ * possibly for making it harder to cheat for hacked clients.
+ * The gravity direction and strength of remote players are synced rather than computed in client.)
  */
 public class GravityComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
     
@@ -126,22 +131,30 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             baseGravityDirection = Direction.DOWN;
         }
         
+        if (tag.contains("baseGravityStrength")) {
+            baseGravityStrength = tag.getDouble("baseGravityStrength");
+        }
+        else {
+            baseGravityStrength = 1.0;
+        }
+        
         // the current gravity is serialized to avoid unnecessary gravity rotation when entering world
         // only deserialize it when initializing entity
-        if (!initialized) {
+        // also deserialize for remote player
+        if (!initialized || GCUtil.isRemotePlayer(entity)) {
             if (tag.contains("currentGravityDirection")) {
                 currGravityDirection = Direction.byName(tag.getString("currentGravityDirection"));
             }
             else {
                 currGravityDirection = Direction.DOWN;
             }
-        }
-        
-        if (tag.contains("baseGravityStrength")) {
-            baseGravityStrength = tag.getDouble("baseGravityStrength");
-        }
-        else {
-            baseGravityStrength = 1.0;
+            
+            if (tag.contains("currentGravityStrength")) {
+                currGravityStrength = tag.getDouble("currentGravityStrength");
+            }
+            else {
+                currGravityStrength = 1.0;
+            }
         }
         
         if (!initialized) {
@@ -158,7 +171,9 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     public void writeToNbt(@NotNull CompoundTag tag) {
         tag.putString("baseGravityDirection", baseGravityDirection.getName());
         tag.putString("currentGravityDirection", currGravityDirection.getName());
+        
         tag.putDouble("baseGravityStrength", baseGravityStrength);
+        tag.putDouble("currentGravityStrength", currGravityStrength);
     }
     
     @Override
@@ -180,6 +195,17 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     }
     
     public void updateGravityStatus() {
+        // for the remote players,
+        // their effect data is not synchronized to the current player
+        // (possibly for making it harder to cheat for hacked clients)
+        // then we don't calculate its gravity in normal way in client
+        if (GCUtil.isRemotePlayer(entity)) {
+            return;
+        }
+        
+        Direction oldGravityDirection = currGravityDirection;
+        double oldGravityStrength = currGravityStrength;
+        
         Entity vehicle = entity.getVehicle();
         if (vehicle != null) {
             currGravityDirection = GravityChangerAPI.getGravityDirection(vehicle);
@@ -218,6 +244,16 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             
             lastUpdateTickCount = entity.tickCount;
         }
+        
+        boolean changed = oldGravityDirection != currGravityDirection ||
+            Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
+        if (entity instanceof ServerPlayer && changed) {
+            sendSyncPacketToOtherPlayers();
+        }
+    }
+    
+    private void sendSyncPacketToOtherPlayers() {
+        GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);
     }
     
     public void applyGravityDirectionEffect(

@@ -95,7 +95,7 @@ public class GravityPotion {
             new ResourceLocation("gravity_changer:gravity_incr_1"),
             STRENGTH_INCR_POTION_1
         );
-    
+        
         for (Direction direction : Direction.values()) {
             Potion potion = DIR_POTIONS.get(direction);
             Registry.register(

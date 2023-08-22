@@ -1,9 +1,11 @@
 package gravity_changer.util;
 
+import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
 
 public class GCUtil {
     public static MutableComponent getLinkText(String link) {
@@ -28,5 +30,12 @@ public class GCUtil {
         }
         
         return 0;
+    }
+    
+    public static boolean isRemotePlayer(Entity entity) {
+        if (entity.level().isClientSide()) {
+            return entity instanceof RemotePlayer;
+        }
+        return false;
     }
 }
