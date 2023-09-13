@@ -1,5 +1,6 @@
 package gravity_changer.util;
 
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.ClickEvent;
@@ -30,6 +31,13 @@ public class GCUtil {
         }
         
         return 0;
+    }
+    
+    public static boolean isClientPlayer(Entity entity) {
+        if (entity.level().isClientSide()) {
+            return entity instanceof LocalPlayer;
+        }
+        return false;
     }
     
     public static boolean isRemotePlayer(Entity entity) {

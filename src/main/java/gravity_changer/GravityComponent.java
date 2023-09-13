@@ -16,7 +16,6 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -40,9 +39,8 @@ import org.slf4j.Logger;
  * The result of applying 1 and 2 is called modified gravity and is synced.
  * The result of 3 is current gravity and is not synced.
  * The gravity effect should be applied both on client and server, except for remote players.
- * (The effect data of remote players are not synced to the current player,
- * possibly for making it harder to cheat for hacked clients.
- * The gravity direction and strength of remote players are synced rather than computed in client.)
+ * (The client player's gravity attributes are separately computed.
+ * Other client entities' are synced from server.)
  */
 public class GravityComponent implements Component, AutoSyncedComponent, CommonTickingComponent {
     
@@ -139,9 +137,8 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
         
         // the current gravity is serialized to avoid unnecessary gravity rotation when entering world
-        // only deserialize it when initializing entity
-        // also deserialize for remote player
-        if (!initialized || GCUtil.isRemotePlayer(entity)) {
+        // do not deserialize it when for client player when not initializing
+        if (!initialized || shouldAcceptServerSync()) {
             if (tag.contains("currentGravityDirection")) {
                 currGravityDirection = Direction.byName(tag.getString("currentGravityDirection"));
             }
@@ -165,6 +162,10 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
                 prevGravityDirection, currGravityDirection, currentRotationParameters, true
             );
         }
+    }
+    
+    private boolean shouldAcceptServerSync() {
+        return entity.level().isClientSide() && !GCUtil.isClientPlayer(entity);
     }
     
     @Override
@@ -195,11 +196,11 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
     }
     
     public void updateGravityStatus() {
-        // for the remote players,
-        // their effect data is not synchronized to the current player
+        // for the remote players and non-player entities,
+        // their effect data is not synchronized to the client
         // (possibly for making it harder to cheat for hacked clients)
         // then we don't calculate its gravity in normal way in client
-        if (GCUtil.isRemotePlayer(entity)) {
+        if (shouldAcceptServerSync()) {
             return;
         }
         
@@ -247,7 +248,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         
         boolean changed = oldGravityDirection != currGravityDirection ||
             Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
-        if (entity instanceof ServerPlayer && changed) {
+        if (changed) {
             sendSyncPacketToOtherPlayers();
         }
     }
