@@ -323,4 +323,23 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         args.set(1, vec3d.y);
         args.set(2, vec3d.z);
     }
+    
+    @WrapOperation(
+        method = "canPlayerFitWithinBlocksAndEntitiesWhen",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/EntityDimensions;makeBoundingBox(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/AABB;"
+        )
+    )
+    private AABB wrapOperation_canPlayerFitWithinBlocksAndEntitiesWhen_getBoundingBox(
+        EntityDimensions dimensions, Vec3 pos, Operation<AABB> original
+    ) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
+        if (gravityDirection == Direction.DOWN) {
+            return original.call(dimensions, pos);
+        }
+        
+        AABB result = RotationUtil.makeBoxFromDimensions(dimensions, gravityDirection, pos);
+        return result;
+    }
 }

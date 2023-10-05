@@ -24,10 +24,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class ClientPlayNetworkHandlerMixin {
     @Shadow
     @Final
-    private Minecraft minecraft;
-    
-    @Shadow
-    @Final
     private Map<UUID, PlayerInfo> playerInfoMap;
     
     @Redirect(
@@ -89,8 +85,12 @@ public abstract class ClientPlayNetworkHandlerMixin {
             ordinal = 0
         )
     )
-    private Vec3 wrapOperation_onExplosion_add_0(Vec3 vec3d, double x, double y, double z, Operation<Vec3> original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(minecraft.player);
+    private Vec3 wrapOperation_onExplosion_add_0(
+        Vec3 vec3d, double x, double y, double z, Operation<Vec3> original
+    ) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(
+            Minecraft.getInstance().player
+        );
         if (gravityDirection == Direction.DOWN) {
             return original.call(vec3d, x, y, z);
         }

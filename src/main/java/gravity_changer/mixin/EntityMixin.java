@@ -153,23 +153,6 @@ public abstract class EntityMixin {
     }
     
     @Inject(
-        method = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;",
-        at = @At("RETURN"),
-        cancellable = true
-    )
-    private void inject_calculateBoundsForPose(Pose pos, CallbackInfoReturnable<AABB> cir) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return;
-        
-        AABB box = cir.getReturnValue().move(this.position.reverse());
-        box = box.inflate(-0.01); // avoid entering crouching because of floating point inaccuracy
-//        if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
-//
-//        }
-        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
-    }
-    
-    @Inject(
         method = "Lnet/minecraft/world/entity/Entity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;",
         at = @At("RETURN"),
         cancellable = true

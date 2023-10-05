@@ -3,6 +3,7 @@ package gravity_changer.util;
 import com.mojang.math.Axis;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -242,5 +243,12 @@ public abstract class RotationUtil {
     
     public static Quaternionf interpolate(Quaternionf startGravityRotation, Quaternionf endGravityRotation, float progress) {
         return new Quaternionf().set(startGravityRotation).slerp(endGravityRotation, progress);
+    }
+    
+    public static AABB makeBoxFromDimensions(
+        EntityDimensions dimensions, Direction gravityDir, Vec3 pos
+    ) {
+        AABB rawBox = dimensions.makeBoundingBox(0, 0, 0);
+        return boxPlayerToWorld(rawBox, gravityDir).move(pos);
     }
 }
