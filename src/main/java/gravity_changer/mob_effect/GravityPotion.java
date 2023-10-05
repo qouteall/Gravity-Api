@@ -34,6 +34,18 @@ public class GravityPotion {
         )
     );
     
+    public static Potion STRENGTH_REVERSE_POTION_0 = new Potion(
+        new MobEffectInstance(
+            GravityStrengthMobEffect.REVERSE, 9600, 0
+        )
+    );
+    
+    public static Potion STRENGTH_REVERSE_POTION_1 = new Potion(
+        new MobEffectInstance(
+            GravityStrengthMobEffect.REVERSE, 9600, 1
+        )
+    );
+    
     public static final EnumMap<Direction, Potion> DIR_POTIONS = new EnumMap<>(Direction.class);
     
     static {
@@ -63,6 +75,8 @@ public class GravityPotion {
         STRENGTH_DECR_POTION_1,
         STRENGTH_INCR_POTION_0,
         STRENGTH_INCR_POTION_1,
+        STRENGTH_REVERSE_POTION_0,
+        STRENGTH_REVERSE_POTION_1,
         DIR_POTIONS.get(Direction.DOWN),
         DIR_POTIONS.get(Direction.UP),
         DIR_POTIONS.get(Direction.NORTH),
@@ -94,6 +108,18 @@ public class GravityPotion {
             BuiltInRegistries.POTION,
             new ResourceLocation("gravity_changer:gravity_incr_1"),
             STRENGTH_INCR_POTION_1
+        );
+        
+        Registry.register(
+            BuiltInRegistries.POTION,
+            new ResourceLocation("gravity_changer:gravity_reverse_0"),
+            STRENGTH_REVERSE_POTION_0
+        );
+        
+        Registry.register(
+            BuiltInRegistries.POTION,
+            new ResourceLocation("gravity_changer:gravity_reverse_1"),
+            STRENGTH_REVERSE_POTION_1
         );
         
         for (Direction direction : Direction.values()) {
