@@ -1,6 +1,8 @@
 plugins {
 	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
+
+	id "me.modmuss50.mod-publish-plugin" version "0.3.5"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -117,5 +119,26 @@ task printClasspath {
 	doLast {
 		// NOTE don't forget to exclude the submod dev jar
 		configurations.compileClasspath.each { println "\"" + (it.toString().replace("\\", "/")) + "\"," }
+	}
+}
+
+publishMods {
+	file = remapJar.archiveFile
+	changelog = file("changelog.md").text
+	type = ALPHA
+	modLoaders.add("fabric")
+
+	displayName = "v${project.mod_version}-mc${project.minecraft_version}"
+	version = "v${project.mod_version}-mc${project.minecraft_version}"
+
+	modrinth {
+		projectId = "bqOyYdKi"
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		minecraftVersions.add(minecraft_version)
+	}
+	github {
+		repository = "qouteall/GravityChanger"
+		accessToken = providers.environmentVariable("GITHUB_TOKEN_FOR_GRAVITY_CHANGER")
+		commitish = minecraft_version // the branch name is the same as minecraft version
 	}
 }
