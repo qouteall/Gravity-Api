@@ -74,7 +74,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             }
         );
     
-    boolean initialized = false;
+    private boolean initialized = false;
     
     // not synchronized
     private Direction prevGravityDirection = Direction.DOWN;

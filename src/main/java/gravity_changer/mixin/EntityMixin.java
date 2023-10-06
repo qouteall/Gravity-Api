@@ -634,6 +634,7 @@ public abstract class EntityMixin {
         if (GravityChangerMod.config.voidDamageOnHorizontalFallTooFar &&
             gravityDirection.getAxis() != Direction.Axis.Y &&
             fallDistance > 1024
+            // TODO also handle reverse gravity strength
         ) {
             this.onBelowWorld();
             ci.cancel();
