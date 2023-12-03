@@ -8,6 +8,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 
 public abstract class RotationUtil {
@@ -209,7 +210,9 @@ public abstract class RotationUtil {
     }
     
     /**
-     * Note: don't modify the quaternion object in-place
+     * Note: this is the rotation that rotates the world for rendering, not the entity.
+     * Note: don't modify the quaternion object in-place.
+     * TODO change return value to {@link Quaternionfc}
      */
     public static Quaternionf getWorldRotationQuaternion(Direction gravityDirection) {
         return WORLD_ROTATION_QUATERNIONS[gravityDirection.get3DDataValue()];
@@ -224,6 +227,7 @@ public abstract class RotationUtil {
     }
     
     /**
+     * Note: this is the rotation that rotates the entity, not the world.
      * Note: don't modify the quaternion object in-place
      */
     public static Quaternionf getCameraRotationQuaternion(Direction gravityDirection) {
