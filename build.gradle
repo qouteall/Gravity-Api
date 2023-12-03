@@ -112,6 +112,15 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+
+//		maven {
+//			name = "GitHubPackages"
+//			url = "https://maven.pkg.github.com/qouteall/GravityChanger"
+//			credentials {
+//				username = System.getenv("GITHUB_ACTOR")
+//				password = System.getenv("GITHUB_TOKEN")
+//			}
+//		}
 	}
 }
 
