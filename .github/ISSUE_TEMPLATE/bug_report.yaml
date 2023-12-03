@@ -8,6 +8,8 @@ body:
       options:
         - "Select One"
         - "1.20.1"
+        - "1.20.2"
+        - "1.20.3"
         - "Other"
     validations:
       required: true
