@@ -55,6 +55,17 @@ public abstract class EntityCollisionContextMixin {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
         if (gravityDirection == Direction.DOWN) return;
         
-        cir.setReturnValue(this.entityBottom > RotationUtil.boxWorldToPlayer(new AABB(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.bounds().inflate(-9.999999747378752E-6D), gravityDirection).maxX);
+        if (shape.isEmpty()) {
+            cir.setReturnValue(true);
+            return;
+        }
+        
+        AABB shapeBox = RotationUtil.boxWorldToPlayer(
+            shape.bounds().inflate(-9.999999747378752E-6D), gravityDirection
+        );
+        AABB posBox = RotationUtil.boxWorldToPlayer(new AABB(pos), gravityDirection);
+        cir.setReturnValue(
+            this.entityBottom > posBox.minY + shapeBox.maxX
+        );
     }
 }
