@@ -1,24 +1,23 @@
 package gravity_changer.mixin.client;
 
-import java.util.Map;
-import java.util.UUID;
-
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import gravity_changer.api.GravityChangerAPI;
+import gravity_changer.util.RotationUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.util.RotationUtil;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Mixin(value = ClientPacketListener.class, priority = 1001)
 public abstract class ClientPacketListenerMixin {

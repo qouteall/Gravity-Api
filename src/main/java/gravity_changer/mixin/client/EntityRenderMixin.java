@@ -1,12 +1,12 @@
 package gravity_changer.mixin.client;
 
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -2,10 +2,6 @@ package gravity_changer.item;
 
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.api.RotationParameters;
-
-import java.util.List;
-
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +14,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+
+import java.util.List;
 
 public class GravityChangerItemAOE extends Item {
     public static final Item GRAVITY_CHANGER_DOWN_AOE = new GravityChangerItemAOE(new Properties().stacksTo(1), Direction.DOWN);

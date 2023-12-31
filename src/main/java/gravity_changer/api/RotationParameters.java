@@ -1,7 +1,6 @@
 package gravity_changer.api;
 
 import gravity_changer.GravityChangerMod;
-import gravity_changer.config.GravityChangerConfig;
 import net.minecraft.nbt.CompoundTag;
 
 public record RotationParameters(

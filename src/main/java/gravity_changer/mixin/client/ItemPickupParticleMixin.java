@@ -1,16 +1,11 @@
 package gravity_changer.mixin.client;
 
 
-import gravity_changer.api.GravityChangerAPI;
-import gravity_changer.util.RotationUtil;
 import net.minecraft.client.particle.ItemPickupParticle;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(ItemPickupParticle.class)
 public abstract class ItemPickupParticleMixin {

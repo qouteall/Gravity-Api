@@ -1,8 +1,5 @@
 package gravity_changer.plating;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mojang.logging.LogUtils;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerMod;
@@ -14,7 +11,6 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -41,6 +37,9 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Based on code from AmethystGravity (by CyborgCabbage)
