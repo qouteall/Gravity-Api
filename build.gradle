@@ -73,10 +73,6 @@ dependencies {
 	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional but recommended)
 	include "dev.onyxstudios.cardinal-components-api:cardinal-components-world:${project.cca_version}"
 
-	implementation("com.github.llamalad7.mixinextras:mixinextras-fabric:${mixin_extras_version}")
-	include("com.github.llamalad7.mixinextras:mixinextras-fabric:${mixin_extras_version}")
-	annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:${mixin_extras_version}")
-
 }
 
 processResources {

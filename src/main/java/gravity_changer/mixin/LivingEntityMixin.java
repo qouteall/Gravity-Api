@@ -501,7 +501,7 @@ public abstract class LivingEntityMixin extends Entity {
         method = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z",
         at = @At(
             value = "INVOKE_ASSIGN",
-            target = "Lnet/minecraft/world/entity/LivingEntity;getViewVector(F)Lnet/minecraft/world/phys/Vec3;",
+            target = "Lnet/minecraft/world/entity/LivingEntity;calculateViewVector(FF)Lnet/minecraft/world/phys/Vec3;",
             ordinal = 0
         ),
         ordinal = 1

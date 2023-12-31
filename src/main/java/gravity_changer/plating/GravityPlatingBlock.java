@@ -1,6 +1,7 @@
 package gravity_changer.plating;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -38,6 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ import java.util.stream.Collectors;
  * Based on code from AmethystGravity (by CyborgCabbage)
  */
 public class GravityPlatingBlock extends BaseEntityBlock {
+    public static final MapCodec<GravityPlatingBlock> CODEC = simpleCodec(GravityPlatingBlock::new);
+    
     // in a corner, multiple faces of plates can occupy the same block
     
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -92,6 +95,11 @@ public class GravityPlatingBlock extends BaseEntityBlock {
                 this.stateDefinition.getPossibleStates().stream()
                     .collect(Collectors.toMap(Function.identity(), GravityPlatingBlock::getShapeForState))
             );
+    }
+    
+    @Override
+    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
     
     private static VoxelShape getShapeForState(BlockState state) {
@@ -283,11 +291,15 @@ public class GravityPlatingBlock extends BaseEntityBlock {
     /**
      * Similar to {@link ShulkerBoxBlock#playerWillDestroy(Level, BlockPos, BlockState, Player)}
      * Make it drop in creative mode.
+     *
+     * @return
      */
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof GravityPlatingBlockEntity be && !level.isClientSide && player.isCreative()) {
+        if (blockEntity instanceof GravityPlatingBlockEntity be &&
+            !level.isClientSide && player.isCreative()
+        ) {
             List<ItemStack> drops = be.getDrops();
         
             for (ItemStack itemStack : drops) {
@@ -301,7 +313,7 @@ public class GravityPlatingBlock extends BaseEntityBlock {
             }
         }
         
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
     
     @Override
