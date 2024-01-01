@@ -1,6 +1,7 @@
 package gravity_changer.api;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.DimensionGravityDataComponent;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerComponents;
@@ -28,7 +29,13 @@ public abstract class GravityChangerAPI {
      * Returns the applied gravity direction for the given entity
      */
     public static Direction getGravityDirection(Entity entity) {
-        return getGravityComponent(entity).getCurrGravityDirection();
+        GravityComponent comp = getGravityComponentEarly(entity);
+        
+        if (comp == null) {
+            return Direction.DOWN;
+        }
+        
+        return comp.getCurrGravityDirection();
     }
     
     public static double getGravityStrength(Entity entity) {
@@ -99,6 +106,19 @@ public abstract class GravityChangerAPI {
     
     public static GravityComponent getGravityComponent(Entity entity) {
         return GRAVITY_COMPONENT.get(entity);
+    }
+    
+    /**
+     * cardinal components initializes the component container in the end of constructor
+     * but bounding box calculation can happen inside constructor
+     * see {@link dev.onyxstudios.cca.mixin.entity.common.MixinEntity}
+     */
+    @SuppressWarnings({"ConstantValue", "UnstableApiUsage", "DataFlowIssue"})
+    public static @Nullable GravityComponent getGravityComponentEarly(Entity entity) {
+        if (((ComponentProvider) entity).getComponentContainer() == null) {
+            return null;
+        }
+        return getGravityComponent(entity);
     }
     
     /**

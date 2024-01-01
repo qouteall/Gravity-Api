@@ -1,6 +1,5 @@
 package gravity_changer.mixin;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
@@ -125,6 +124,7 @@ public abstract class EntityMixin {
     @Shadow
     public float fallDistance;
     
+    @SuppressWarnings("ConstantValue")
     @Inject(
         method = "Lnet/minecraft/world/entity/Entity;makeBoundingBox()Lnet/minecraft/world/phys/AABB;",
         at = @At("RETURN"),
@@ -133,13 +133,6 @@ public abstract class EntityMixin {
     private void inject_calculateBoundingBox(CallbackInfoReturnable<AABB> cir) {
         Entity entity = ((Entity) (Object) this);
         if (entity instanceof Projectile) return;
-        
-        // cardinal components initializes the component container in the end of constructor
-        // but bounding box calculation can happen inside constructor
-        // see dev.onyxstudios.cca.mixin.entity.common.MixinEntity
-        if (((ComponentProvider) entity).getComponentContainer() == null) {
-            return;
-        }
         
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) return;
@@ -476,7 +469,9 @@ public abstract class EntityMixin {
         )
     )
     private double redirect_getHorizontalFacing_getYaw_0(double rotation) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
+        Entity this_ = (Entity) (Object) this;
+        
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this_);
         if (gravityDirection == Direction.DOWN) {
             return rotation;
         }
