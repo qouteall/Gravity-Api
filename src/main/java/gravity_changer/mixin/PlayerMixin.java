@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
+@SuppressWarnings("resource")
 @Mixin(value = Player.class, priority = 1001)
 public abstract class PlayerMixin extends LivingEntity {
     @Shadow
@@ -103,15 +104,25 @@ public abstract class PlayerMixin extends LivingEntity {
             ordinal = 0
         )
     )
-    private ItemEntity redirect_dropItem_new_0(Level world, double x, double y, double z, ItemStack stack) {
+    private ItemEntity redirect_dropItem_new_0(
+        Level world, double x, double y, double z, ItemStack stack
+    ) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
             return new ItemEntity(world, x, y, z, stack);
         }
         
-        Vec3 vec3d = this.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.30000001192092896D, 0.0D, gravityDirection));
+        Vec3 vec3d = this.getEyePosition()
+            .subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.3D, 0.0D, gravityDirection));
         
-        return new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
+        ItemEntity itemEntity = new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
+        
+//        // change the gravity of the thrown item
+//        GravityChangerAPI.setBaseGravityDirection(
+//            itemEntity, gravityDirection
+//        );
+        
+        return itemEntity;
     }
     
     @WrapOperation(
@@ -129,7 +140,7 @@ public abstract class PlayerMixin extends LivingEntity {
         }
         
         Vec3 world = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
-        original.call(itemEntity, world.x, world.y, world.z);
+        GravityChangerAPI.setWorldVelocity(itemEntity, world);
     }
     
     @Inject(

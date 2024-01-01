@@ -51,7 +51,8 @@
     "UseOnContextMixin",
     "WitchMixin",
     "WitherBossMixin",
-    "fall_distance.ServerPlayerMixin_FallDistance"
+    "fall_distance.ServerPlayerMixin_FallDistance",
+    "item.BehaviorUtilsMixin"
   ],
   "client": [
     "client.BiomeAmbientSoundHandlerMixin",

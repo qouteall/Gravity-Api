@@ -183,7 +183,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             return;
         }
         
-        updateGravityStatus();
+        updateGravityStatus(true);
         
         applyGravityChange();
         
@@ -195,7 +195,7 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
         }
     }
     
-    public void updateGravityStatus() {
+    public void updateGravityStatus(boolean sendPacketIfNecessary) {
         // for the remote players and non-player entities,
         // their effect data is not synchronized to the client
         // (possibly for making it harder to cheat for hacked clients)
@@ -246,10 +246,12 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             lastUpdateTickCount = entity.tickCount;
         }
         
-        boolean changed = oldGravityDirection != currGravityDirection ||
-            Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
-        if (changed) {
-            sendSyncPacketToOtherPlayers();
+        if (sendPacketIfNecessary) {
+            boolean changed = oldGravityDirection != currGravityDirection ||
+                Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
+            if (changed) {
+                sendSyncPacketToOtherPlayers();
+            }
         }
     }
     
@@ -516,8 +518,14 @@ public class GravityComponent implements Component, AutoSyncedComponent, CommonT
             return;
         }
         
-        baseGravityDirection = gravityDirection;
-        needsSync = true;
+        if (baseGravityDirection != gravityDirection) {
+            baseGravityDirection = gravityDirection;
+            needsSync = true;
+            
+            // update gravity immediately
+            // avoid having wrong info from getGravityDirection()
+            updateGravityStatus(false); // will this cause issue?
+        }
     }
     
     public void reset() {

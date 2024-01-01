@@ -90,7 +90,7 @@ public abstract class GravityChangerAPI {
     /**
      * Instantly set gravity direction on client side without performing animation.
      * Not needed in normal cases.
-     * (Used by ImmPtl)
+     * (Used by iPortal)
      */
     public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
         Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
@@ -99,7 +99,7 @@ public abstract class GravityChangerAPI {
         
         component.setBaseGravityDirection(direction);
     
-        component.updateGravityStatus();
+        component.updateGravityStatus(false);
         
         component.forceApplyGravityChange();
     }
