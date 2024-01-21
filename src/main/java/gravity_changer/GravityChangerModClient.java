@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 
 public class GravityChangerModClient implements ClientModInitializer {
     private static final String ISSUE_LINK = "https://github.com/qouteall/GravityChanger/issues";
-    private static boolean displayPreviewWarning = false;
+    private static boolean displayPreviewWarning = true;
     
     @Override
     public void onInitializeClient() {

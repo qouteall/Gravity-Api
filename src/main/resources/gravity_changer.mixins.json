@@ -51,6 +51,7 @@
     "UseOnContextMixin",
     "WitchMixin",
     "WitherBossMixin",
+    "debug.MixinEntity_Debug",
     "fall_distance.ServerPlayerMixin_FallDistance",
     "item.BehaviorUtilsMixin"
   ],

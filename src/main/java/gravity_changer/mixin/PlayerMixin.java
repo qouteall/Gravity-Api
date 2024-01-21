@@ -121,6 +121,9 @@ public abstract class PlayerMixin extends LivingEntity {
 //        GravityChangerAPI.setBaseGravityDirection(
 //            itemEntity, gravityDirection
 //        );
+        // the item entity calculates position both on client and server separately
+        // if gravity is not down, the client and server will desync (the reason is not yet known)
+        // don't let item change gravity for now
         
         return itemEntity;
     }

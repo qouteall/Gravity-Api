@@ -1,1 +1,1 @@
-Upgrade to 1.20.2.
+Upgrade to 1.20.4.
